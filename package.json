@@ -1,0 +1,11 @@
+{
+  "name": "tenantpro",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tenant complaint and property maintenance management platform.",
+  "scripts": {
+    "dev:client": "pnpm --filter tenantpro-client dev",
+    "dev:server": "pnpm --filter tenantpro-server dev",
+    "typecheck": "pnpm -r typecheck"
+  }
+}
