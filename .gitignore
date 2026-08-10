@@ -5,3 +5,6 @@ coverage/
 .env.local
 *.log
 .DS_Store
+
+# Nested GitHub clone retained as a local backup; it is not part of this project.
+/Tenantpro/
