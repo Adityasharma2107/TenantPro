@@ -27,7 +27,9 @@ postman/ # API request collection
 - [x] React + TypeScript + Vite client scaffolded
 - [x] Express + TypeScript server scaffolded
 - [x] Health-check endpoint added
-- [ ] MongoDB models and authentication (Day 2-3)
+- [x] MongoDB/Mongoose connection and core data models added (Day 2)
+- [ ] MongoDB Atlas connection string configuration
+- [ ] Authentication (Day 3)
 - [ ] Ticket workflow (Day 4)
 - [ ] Dashboards and real-time updates (Day 5-10)
 - [ ] Tests, CI/CD, Docker, and deployment (Day 11-14)
