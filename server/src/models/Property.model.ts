@@ -13,6 +13,7 @@ export interface IProperty {
   contactEmail?: string;
 }
 
+// Stores a building, hostel, or rental property managed through TenantPro.
 const propertySchema = new Schema<IProperty>(
   {
     name: { type: String, required: true, trim: true },

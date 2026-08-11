@@ -12,10 +12,12 @@ export interface IUser {
   isActive: boolean;
 }
 
+// Stores each tenant, manager, or technician and links them to one property.
 const userSchema = new Schema<IUser>(
   {
     name: { type: String, required: true, trim: true, minlength: 2, maxlength: 80 },
     email: { type: String, required: true, unique: true, trim: true, lowercase: true },
+    // The real password is never stored; this field holds its bcrypt hash.
     passwordHash: { type: String, required: true, select: false },
     role: { type: String, enum: userRoles, required: true },
     property: { type: Schema.Types.ObjectId, ref: 'Property', required: true },

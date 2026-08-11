@@ -32,6 +32,7 @@ export interface ITicket {
   resolvedAt?: Date;
 }
 
+// Stores one maintenance complaint from creation until it is resolved or closed.
 const ticketSchema = new Schema<ITicket>(
   {
     title: { type: String, required: true, trim: true, minlength: 5, maxlength: 120 },
@@ -50,6 +51,7 @@ const ticketSchema = new Schema<ITicket>(
   { timestamps: true },
 );
 
+// These indexes keep common dashboard and technician ticket queries fast.
 ticketSchema.index({ property: 1, status: 1, priority: -1 });
 ticketSchema.index({ tenant: 1, createdAt: -1 });
 ticketSchema.index({ assignedTechnician: 1, status: 1 });

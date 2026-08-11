@@ -19,6 +19,7 @@ export interface IActivityLog {
   description: string;
 }
 
+// Keeps an audit trail of important events, such as ticket assignment or closure.
 const activityLogSchema = new Schema<IActivityLog>(
   {
     ticket: { type: Schema.Types.ObjectId, ref: 'Ticket', required: true },

@@ -5,6 +5,7 @@ import { connectDatabase } from './config/database.js';
 
 const port = Number(process.env.PORT ?? 5000);
 
+// Starts MongoDB first so the API never accepts requests without a database connection.
 const startServer = async (): Promise<void> => {
   try {
     await connectDatabase();
@@ -18,4 +19,5 @@ const startServer = async (): Promise<void> => {
   }
 };
 
+// `void` explicitly marks this startup promise as intentionally not awaited at top level.
 void startServer();

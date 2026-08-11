@@ -6,6 +6,7 @@ export interface IComment {
   message: string;
 }
 
+// Stores a conversation message attached to one maintenance ticket.
 const commentSchema = new Schema<IComment>(
   {
     ticket: { type: Schema.Types.ObjectId, ref: 'Ticket', required: true },
@@ -15,6 +16,7 @@ const commentSchema = new Schema<IComment>(
   { timestamps: true },
 );
 
+// Lets the ticket-details page load comments in time order efficiently.
 commentSchema.index({ ticket: 1, createdAt: 1 });
 
 export const Comment = model<IComment>('Comment', commentSchema);
