@@ -1,6 +1,10 @@
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import express from 'express';
 import helmet from 'helmet';
+
+import { errorHandler, notFoundHandler } from './middlewares/error.middleware.js';
+import authRouter from './routes/auth.routes.js';
 
 const app = express();
 
@@ -18,6 +22,9 @@ app.use(
 // Converts JSON request bodies into JavaScript objects for API routes.
 app.use(express.json());
 
+// Reads the HTTP-only authentication cookie sent by the browser.
+app.use(cookieParser());
+
 // A small endpoint used to confirm that the API process is alive.
 app.get('/api/health', (_request, response) => {
   response.status(200).json({
@@ -25,5 +32,11 @@ app.get('/api/health', (_request, response) => {
     status: 'ok',
   });
 });
+
+// Groups all account-related endpoints under one consistent API path.
+app.use('/api/auth', authRouter);
+
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 export default app;
