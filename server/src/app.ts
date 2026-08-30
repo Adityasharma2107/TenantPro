@@ -5,6 +5,8 @@ import helmet from 'helmet';
 
 import { errorHandler, notFoundHandler } from './middlewares/error.middleware.js';
 import authRouter from './routes/auth.routes.js';
+import teamRouter from './routes/team.routes.js';
+import ticketRouter from './routes/ticket.routes.js';
 
 const app = express();
 
@@ -35,6 +37,12 @@ app.get('/api/health', (_request, response) => {
 
 // Groups all account-related endpoints under one consistent API path.
 app.use('/api/auth', authRouter);
+
+// Managers use this route group to create and list their residents and technicians.
+app.use('/api/team', teamRouter);
+
+// Holds the property-maintenance workflow from ticket creation through resolution.
+app.use('/api/tickets', ticketRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

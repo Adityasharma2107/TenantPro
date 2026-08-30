@@ -30,6 +30,6 @@ postman/ # API request collection
 - [x] MongoDB/Mongoose connection and core data models added (Day 2)
 - [x] MongoDB Atlas connection string configured
 - [x] Manager registration, JWT login cookies, and role middleware added (Day 3)
-- [ ] Ticket workflow (Day 4)
+- [x] Team management and ticket workflow APIs added (Day 4)
 - [ ] Dashboards and real-time updates (Day 5-10)
-- [ ] Tests, CI/CD, Docker, and deployment (Day 11-14)
+- [ ] Tests, CI/CD, Docker, and deployment (Day 10-14)

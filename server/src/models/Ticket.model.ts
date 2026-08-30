@@ -10,7 +10,7 @@ export const ticketCategories = [
   'other',
 ] as const;
 
-export const ticketPriorities = ['low', 'medium', 'high', 'urgent'] as const;
+export const ticketPriorities = ['unassigned', 'low', 'medium', 'high', 'urgent'] as const;
 export const ticketStatuses = ['open', 'assigned', 'in_progress', 'resolved', 'closed'] as const;
 
 export type TicketCategory = (typeof ticketCategories)[number];
@@ -38,7 +38,8 @@ const ticketSchema = new Schema<ITicket>(
     title: { type: String, required: true, trim: true, minlength: 5, maxlength: 120 },
     description: { type: String, required: true, trim: true, minlength: 10, maxlength: 2_000 },
     category: { type: String, enum: ticketCategories, required: true },
-    priority: { type: String, enum: ticketPriorities, default: 'medium' },
+    // Non-emergency categories begin unassigned until a manager reviews the ticket.
+    priority: { type: String, enum: ticketPriorities, default: 'unassigned' },
     status: { type: String, enum: ticketStatuses, default: 'open' },
     location: { type: String, required: true, trim: true, maxlength: 120 },
     imageUrls: { type: [String], default: [] },

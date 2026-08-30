@@ -9,6 +9,8 @@ export interface IUser {
   passwordHash: string;
   role: UserRole;
   property: Types.ObjectId;
+  unitNumber?: string;
+  specialization?: string;
   isActive: boolean;
 }
 
@@ -21,6 +23,10 @@ const userSchema = new Schema<IUser>(
     passwordHash: { type: String, required: true, select: false },
     role: { type: String, enum: userRoles, required: true },
     property: { type: Schema.Types.ObjectId, ref: 'Property', required: true },
+    // A unit is required by the team-management API for tenant accounts.
+    unitNumber: { type: String, trim: true, maxlength: 30 },
+    // Technicians can be tagged with a skill such as plumbing or electrical work.
+    specialization: { type: String, trim: true, maxlength: 80 },
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true },
