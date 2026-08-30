@@ -1,122 +1,66 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState, type FormEvent } from 'react'
+import {
+  ArrowUpRight, Bell, Building2, ChevronLeft, ChevronRight, CircleAlert,
+  CircleCheck, ClipboardList, Clock3, LayoutDashboard, LogOut, Menu, Plus,
+  Search, Settings, UsersRound, Wrench,
+} from 'lucide-react'
+import { Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 
-function App() {
-  const [count, setCount] = useState(0)
+const navigation = [
+  ['Dashboard', LayoutDashboard, '/app/dashboard'], ['Tickets', ClipboardList, '/app/tickets'],
+  ['Residents', UsersRound, '/app/residents'], ['Technicians', Wrench, '/app/technicians'],
+  ['Property', Building2, '/app/property'], ['Settings', Settings, '/app/settings'],
+] as const
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+const tickets = [
+  ['#1024', 'Water leakage in bathroom', 'A-204', 'Urgent', 'In progress', '10 min ago'],
+  ['#1023', 'Ceiling fan not working', 'B-112', 'Medium', 'Open', '1 hour ago'],
+  ['#1022', 'Main gate lock is loose', 'Gatehouse', 'High', 'Assigned', '3 hours ago'],
+  ['#1021', 'Kitchen drain is clogged', 'C-301', 'Medium', 'Resolved', 'Yesterday'],
+]
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+const statusStyle: Record<string, string> = {
+  Open: 'bg-blue-50 text-blue-700 ring-blue-600/10', Assigned: 'bg-violet-50 text-violet-700 ring-violet-600/10',
+  'In progress': 'bg-amber-50 text-amber-700 ring-amber-600/10', Resolved: 'bg-emerald-50 text-emerald-700 ring-emerald-600/10',
 }
 
+// Reuses the TenantPro wordmark on login pages and inside the sidebar.
+function Brand({ compact = false }: { compact?: boolean }) {
+  return <div className="flex items-center gap-3"><div className="grid size-10 place-items-center rounded-xl bg-[#635985] font-bold text-white shadow-lg shadow-[#635985]/25">T</div>{!compact && <div><p className="text-lg font-bold tracking-tight text-white">TenantPro</p><p className="text-xs text-slate-400">Property operations</p></div>}</div>
+}
+
+function Metric({ label, value, detail, icon: Icon, tone }: { label: string; value: string; detail: string; icon: typeof ClipboardList; tone: string }) {
+  return <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"><div className="flex justify-between"><div><p className="text-sm font-medium text-slate-500">{label}</p><p className="mt-3 text-3xl font-bold tracking-tight text-[#18122B]">{value}</p></div><span className={`grid size-11 place-items-center rounded-xl ${tone}`}><Icon size={21} /></span></div><p className="mt-4 text-xs font-medium text-slate-500">{detail}</p></article>
+}
+
+function RecentTickets() {
+  return <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><div className="flex items-center justify-between border-b border-slate-100 px-6 py-5"><div><h2 className="font-semibold text-[#18122B]">Recent tickets</h2><p className="mt-1 text-sm text-slate-500">Latest maintenance activity</p></div><Link className="inline-flex items-center gap-1 text-sm font-semibold text-[#635985]" to="/app/tickets">View all <ArrowUpRight size={16} /></Link></div><div className="overflow-x-auto"><table className="min-w-[700px] w-full text-left text-sm"><thead className="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500"><tr><th className="px-6 py-3">Ticket</th><th className="px-4 py-3">Unit</th><th className="px-4 py-3">Priority</th><th className="px-4 py-3">Status</th><th className="px-6 py-3 text-right">Updated</th></tr></thead><tbody className="divide-y divide-slate-100">{tickets.map(([id, issue, unit, priority, status, updated]) => <tr className="hover:bg-slate-50" key={id}><td className="px-6 py-4"><p className="font-semibold text-[#393053]">{id}</p><p className="mt-1 font-medium text-slate-700">{issue}</p></td><td className="px-4 py-4 text-slate-600">{unit}</td><td className={`px-4 py-4 font-semibold ${priority === 'Urgent' ? 'text-rose-600' : priority === 'High' ? 'text-orange-600' : 'text-slate-600'}`}>{priority}</td><td className="px-4 py-4"><span className={`rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${statusStyle[status]}`}>{status}</span></td><td className="px-6 py-4 text-right text-slate-500">{updated}</td></tr>)}</tbody></table></div></section>
+}
+
+function Dashboard() {
+  return <><div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="text-sm font-semibold text-[#635985]">Monday, 31 August</p><h1 className="mt-1 text-3xl font-bold tracking-tight text-[#18122B]">Good morning, Aditya.</h1><p className="mt-2 text-slate-500">Here is what needs your attention today.</p></div><button className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#635985] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-[#635985]/20 hover:bg-[#393053]"><Plus size={18} /> Create ticket</button></div><section className="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><Metric label="Open tickets" value="12" detail="3 added this week" icon={ClipboardList} tone="bg-blue-50 text-[#30AFFF]" /><Metric label="Urgent" value="3" detail="Need attention today" icon={CircleAlert} tone="bg-rose-50 text-rose-600" /><Metric label="In progress" value="7" detail="Technicians are working" icon={Clock3} tone="bg-amber-50 text-amber-600" /><Metric label="Resolved" value="28" detail="This month so far" icon={CircleCheck} tone="bg-emerald-50 text-emerald-600" /></section><section className="mt-6 grid gap-6 xl:grid-cols-[1.6fr_0.9fr]"><RecentTickets /><article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><h2 className="font-semibold text-[#18122B]">Ticket status</h2><p className="mt-1 text-sm text-slate-500">Current workload overview</p><div className="mt-9 space-y-5">{[['Open','12','w-[72%]','bg-[#30AFFF]'],['Assigned','8','w-[48%]','bg-[#635985]'],['In progress','7','w-[42%]','bg-amber-400'],['Resolved','28','w-full','bg-emerald-500']].map(([label,count,width,color]) => <div key={label}><div className="mb-2 flex justify-between text-sm"><span className="font-medium text-slate-600">{label}</span><span className="font-semibold text-[#18122B]">{count}</span></div><div className="h-2 rounded-full bg-slate-100"><div className={`h-2 rounded-full ${width} ${color}`} /></div></div>)}</div><div className="mt-8 rounded-xl bg-[#D8FFC5]/50 p-4"><p className="text-xs font-bold uppercase tracking-wider text-emerald-700">Property health</p><p className="mt-1 text-sm font-medium text-[#18122B]">82% of tickets resolved within target.</p></div></article></section></>
+}
+
+function Placeholder() {
+  const label = useLocation().pathname.split('/').at(-1) ?? 'Page'
+  return <div className="grid min-h-[55vh] place-items-center rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center"><div><p className="text-lg font-bold capitalize text-[#18122B]">{label} page</p><p className="mt-2 text-slate-500">This screen will connect to the Day 4 API in the next frontend step.</p></div></div>
+}
+
+// Provides the responsive, collapsible shell used by all authenticated pages.
+function AppShell() {
+  const [collapsed, setCollapsed] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const location = useLocation()
+  return <div className="min-h-screen bg-[#F8FAFC]">{mobileOpen && <button onClick={() => setMobileOpen(false)} className="fixed inset-0 z-30 bg-[#18122B]/45 lg:hidden" aria-label="Close navigation" />}<aside className={`fixed inset-y-0 left-0 z-40 flex w-[280px] flex-col border-r border-white/10 bg-[#18122B] px-4 py-5 transition-all duration-300 ${collapsed ? 'lg:w-[88px]' : 'lg:w-[280px]'} ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}><div className="flex items-center justify-between px-2"><Brand compact={collapsed} /><button onClick={() => setCollapsed(!collapsed)} className="hidden rounded-lg p-2 text-slate-400 hover:bg-white/10 hover:text-white lg:block" aria-label="Toggle sidebar">{collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}</button></div>{!collapsed && <button className="mt-8 flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-left"><span className="grid size-8 place-items-center rounded-lg bg-[#30AFFF]/15 text-[#92EEFF]"><Building2 size={16}/></span><span className="min-w-0 flex-1"><span className="block truncate text-sm font-semibold text-white">Green View Apartments</span><span className="block text-xs text-slate-400">24 units · Manager view</span></span><ChevronRight size={16} className="text-slate-400" /></button>}<nav className="mt-8 space-y-1">{!collapsed && <p className="mb-2 px-3 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Workspace</p>}{navigation.map(([label, Icon, to]) => <NavLink key={to} to={to} onClick={() => setMobileOpen(false)} title={collapsed ? label : undefined} className={({isActive}) => `flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium ${isActive ? 'bg-[#635985] text-white shadow-lg shadow-[#635985]/20' : 'text-slate-400 hover:bg-white/7 hover:text-white'}`}><Icon size={19}/>{!collapsed && label}</NavLink>)}</nav><div className="mt-auto">{!collapsed && <div className="mb-5 rounded-xl bg-[#393053] p-4"><p className="text-xs font-semibold text-[#D8FFC5]">PROPERTY HEALTH</p><p className="mt-2 text-sm font-semibold text-white">82% resolved on time</p><div className="mt-3 h-1.5 rounded-full bg-white/15"><div className="h-full w-[82%] rounded-full bg-[#92EEFF]" /></div></div>}<div className="flex items-center gap-3 border-t border-white/10 px-2 pt-4"><div className="grid size-9 place-items-center rounded-full bg-[#D8FFC5] text-sm font-bold text-[#393053]">AS</div>{!collapsed && <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-white">Aditya Sharma</p><p className="text-xs text-slate-400">Property manager</p></div>}<LogOut size={17} className="text-slate-400"/></div></div></aside><div className={`transition-all duration-300 ${collapsed ? 'lg:pl-[88px]' : 'lg:pl-[280px]'}`}><header className="sticky top-0 z-20 flex h-20 items-center gap-4 border-b border-slate-200 bg-white/90 px-5 backdrop-blur lg:px-8"><button onClick={() => setMobileOpen(true)} className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 lg:hidden" aria-label="Open navigation"><Menu size={21}/></button><div className="hidden lg:block"><p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Property</p><p className="text-sm font-semibold text-[#18122B]">Green View Apartments</p></div><div className="relative ml-auto hidden w-full max-w-sm md:block"><Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"/><input className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm outline-none focus:border-[#635985] focus:ring-4 focus:ring-[#635985]/10" placeholder="Search tickets..."/></div><button className="relative rounded-xl p-2.5 text-slate-500 hover:bg-slate-100"><Bell size={20}/><span className="absolute right-2 top-2 size-2 rounded-full bg-rose-500 ring-2 ring-white"/></button><div className="grid size-9 place-items-center rounded-full bg-[#393053] text-xs font-bold text-white">AS</div></header><main className="mx-auto max-w-[1600px] p-5 lg:p-8">{location.pathname === '/app/dashboard' ? <Dashboard/> : <Placeholder/>}</main></div></div>
+}
+
+// Keeps this day's screens API-free while preparing their routes and form behavior.
+function AuthPage({ register }: { register: boolean }) {
+  const navigate = useNavigate()
+  const [showPassword, setShowPassword] = useState(false)
+  const submit = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); navigate('/app/dashboard') }
+  return <main className="min-h-screen bg-[#F8FAFC] p-4 lg:p-7"><div className="mx-auto grid min-h-[calc(100vh-2rem)] max-w-7xl overflow-hidden rounded-[2rem] bg-white shadow-2xl shadow-[#18122B]/10 lg:grid-cols-[1.05fr_0.95fr]"><section className="relative hidden overflow-hidden bg-gradient-to-br from-[#18122B] via-[#393053] to-[#635985] p-12 lg:flex lg:flex-col"><div className="absolute -left-32 bottom-0 size-[26rem] rounded-full bg-[#30AFFF]/25 blur-3xl"/><div className="relative"><Brand/><div className="mt-28 max-w-md"><p className="text-sm font-bold uppercase tracking-[0.18em] text-[#92EEFF]">Property maintenance, simplified</p><h1 className="mt-5 text-5xl font-bold leading-tight tracking-tight text-white">A clearer way to care for every home.</h1><p className="mt-6 text-lg leading-8 text-slate-300">TenantPro keeps residents, managers, and technicians aligned from the first report to final resolution.</p></div></div><div className="relative mt-auto grid grid-cols-3 gap-3">{[['28','Resolved this month'],['82%','On-time repairs'],['24','Homes connected']].map(([n,l]) => <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur" key={l}><p className="text-2xl font-bold text-white">{n}</p><p className="mt-1 text-xs text-slate-300">{l}</p></div>)}</div></section><section className="flex items-center justify-center p-6 sm:p-12"><div className="w-full max-w-md"><div className="lg:hidden"><div className="inline-flex items-center gap-2 text-[#393053]"><span className="grid size-9 place-items-center rounded-xl bg-[#635985] font-bold text-white">T</span><span className="font-bold">TenantPro</span></div></div><p className="mt-12 text-sm font-bold uppercase tracking-[0.14em] text-[#635985]">{register ? 'Manager onboarding' : 'Welcome back'}</p><h2 className="mt-3 text-3xl font-bold tracking-tight text-[#18122B]">{register ? 'Set up your property workspace.' : 'Sign in to TenantPro.'}</h2><p className="mt-3 text-slate-500">{register ? 'Create the first manager account for your property.' : 'Manage maintenance without the back-and-forth.'}</p><form onSubmit={submit} className="mt-9 space-y-5">{register && <label className="block text-sm font-semibold text-slate-700">Your full name<input required className="auth-input" placeholder="Aditya Sharma"/></label>}<label className="block text-sm font-semibold text-slate-700">Email address<input required type="email" className="auth-input" placeholder="you@example.com"/></label><label className="block text-sm font-semibold text-slate-700">Password<div className="relative"><input required type={showPassword ? 'text' : 'password'} className="auth-input pr-20" placeholder="••••••••"/><button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[#635985]">{showPassword ? 'Hide' : 'Show'}</button></div></label>{register && <p className="text-xs leading-5 text-slate-500">Use at least 8 characters with uppercase, lowercase, and a number.</p>}<button className="w-full rounded-xl bg-[#635985] px-4 py-3.5 font-semibold text-white shadow-lg shadow-[#635985]/25 hover:bg-[#393053]" type="submit">{register ? 'Create manager account' : 'Sign in'} <ArrowUpRight className="ml-1 inline" size={16}/></button></form><p className="mt-7 text-center text-sm text-slate-500">{register ? 'Already have an account?' : 'New to TenantPro?'} <Link className="font-bold text-[#635985]" to={register ? '/login' : '/register'}>{register ? 'Sign in' : 'Create a manager account'}</Link></p></div></section></div></main>
+}
+
+function App() { return <Routes><Route path="/login" element={<AuthPage register={false}/>}/><Route path="/register" element={<AuthPage register/>}/><Route path="/app/*" element={<AppShell/>}/><Route path="/" element={<Navigate to="/login" replace/>}/><Route path="*" element={<Navigate to="/login" replace/>}/></Routes> }
 export default App

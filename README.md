@@ -31,5 +31,6 @@ postman/ # API request collection
 - [x] MongoDB Atlas connection string configured
 - [x] Manager registration, JWT login cookies, and role middleware added (Day 3)
 - [x] Team management and ticket workflow APIs added (Day 4)
-- [ ] Dashboards and real-time updates (Day 5-10)
+- [x] React Router, Tailwind design system, authentication screens, and manager dashboard shell added (Day 5)
+- [ ] Dashboard data, ticket pages, and real-time updates (Day 6-10)
 - [ ] Tests, CI/CD, Docker, and deployment (Day 10-14)
