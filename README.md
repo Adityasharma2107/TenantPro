@@ -32,5 +32,6 @@ postman/ # API request collection
 - [x] Manager registration, JWT login cookies, and role middleware added (Day 3)
 - [x] Team management and ticket workflow APIs added (Day 4)
 - [x] React Router, Tailwind design system, authentication screens, and manager dashboard shell added (Day 5)
-- [ ] Dashboard data, ticket pages, and real-time updates (Day 6-10)
+- [x] Secure frontend sign-in, manager registration, React Query, and live dashboard ticket data added (Day 6)
+- [ ] Ticket pages and real-time updates (Day 7-10)
 - [ ] Tests, CI/CD, Docker, and deployment (Day 10-14)

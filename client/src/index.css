@@ -14,8 +14,9 @@ button, input { font: inherit; }
   background:
     radial-gradient(circle at 88% 8%, rgb(146 238 255 / .24), transparent 25rem),
     radial-gradient(circle at 35% 100%, rgb(99 89 133 / .22), transparent 34rem),
-    linear-gradient(135deg, rgb(248 250 252 / .91), rgb(235 239 250 / .87)),
+    linear-gradient(135deg, rgb(248 250 252 / .64), rgb(235 239 250 / .56)),
     url('./assets/tenantpro-building-hero.png') center / cover fixed !important;
+  animation: tenantpro-background-drift 18s ease-in-out infinite alternate;
 }
 
 #root > main.min-h-screen {
@@ -26,17 +27,17 @@ button, input { font: inherit; }
 }
 
 /* Soft raised surfaces are the reusable neumorphism treatment for dashboard content. */
-#root article,
-#root section.overflow-hidden {
+#root > div.min-h-screen article,
+#root > div.min-h-screen section.overflow-hidden {
   background: rgb(255 255 255 / .78) !important;
   backdrop-filter: blur(14px);
   border-color: rgb(255 255 255 / .8) !important;
   box-shadow: 10px 10px 24px rgb(49 60 96 / .11), -8px -8px 22px rgb(255 255 255 / .76) !important;
 }
 
-#root article { animation: tenantpro-float-in 520ms ease both; }
-#root article:nth-of-type(2) { animation-delay: 80ms; }
-#root article:nth-of-type(3) { animation-delay: 140ms; }
+#root > div.min-h-screen article { animation: tenantpro-float-in 520ms ease both; }
+#root > div.min-h-screen article:nth-of-type(2) { animation-delay: 80ms; }
+#root > div.min-h-screen article:nth-of-type(3) { animation-delay: 140ms; }
 
 /* The login illustration uses the original asset under a readable violet overlay. */
 #root .bg-gradient-to-br {
@@ -48,9 +49,36 @@ button, input { font: inherit; }
 }
 
 #root > main > div {
-  background: rgb(255 255 255 / .72) !important;
+  background:
+    radial-gradient(circle at 85% 12%, rgb(146 238 255 / .42), transparent 18rem),
+    radial-gradient(circle at 18% 90%, rgb(99 89 133 / .17), transparent 22rem),
+    rgb(255 255 255 / .68) !important;
   backdrop-filter: blur(18px);
 }
+
+/* Removes the empty white feel while preserving a calm, focused area for the login form. */
+#root > main.min-h-screen > div > section:last-child {
+  background:
+    radial-gradient(circle at 90% 10%, rgb(216 255 197 / .56), transparent 15rem),
+    radial-gradient(circle at 8% 88%, rgb(48 175 255 / .16), transparent 20rem),
+    rgb(255 255 255 / .78);
+}
+
+#root .bg-gradient-to-br > .relative { animation: tenantpro-login-copy 700ms ease both; }
+#root > main.min-h-screen > div > section:last-child > div { animation: tenantpro-login-form 700ms 110ms ease both; }
+#root > main.min-h-screen > div > section:last-child .auth-input:hover { border-color: rgb(99 89 133 / .45); }
+#root > main.min-h-screen > div > section:last-child button[type="submit"] { position: relative; overflow: hidden; }
+#root > main.min-h-screen > div > section:last-child button[type="submit"]::after {
+  content: ""; position: absolute; inset: 0; transform: translateX(-115%);
+  background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / .24), transparent 65%);
+  transition: transform 520ms ease;
+}
+#root > main.min-h-screen > div > section:last-child button[type="submit"]:hover::after { transform: translateX(115%); }
+
+#root > div.min-h-screen nav a { transition: background-color 180ms ease, color 180ms ease, transform 180ms ease, box-shadow 180ms ease; }
+#root > div.min-h-screen nav a:hover { transform: translateX(3px); }
+#root > div.min-h-screen header { animation: tenantpro-fade-down 480ms ease both; }
+#root > div.min-h-screen main > section { animation: tenantpro-float-in 520ms ease both; }
 
 .auth-input {
   background: rgb(255 255 255 / .7);
@@ -62,6 +90,26 @@ button:hover { transform: translateY(-1px); }
 
 @keyframes tenantpro-float-in {
   from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tenantpro-background-drift {
+  from { background-position: center, center, center, 48% 48%; }
+  to { background-position: center, center, center, 54% 52%; }
+}
+
+@keyframes tenantpro-login-copy {
+  from { opacity: 0; transform: translateX(-14px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes tenantpro-login-form {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tenantpro-fade-down {
+  from { opacity: 0; transform: translateY(-8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
