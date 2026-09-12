@@ -1,5 +1,6 @@
 // Keeps every browser-to-server request in one place and always includes the secure login cookie.
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000';
+const rawBase = import.meta.env.VITE_API_URL ?? 'http://localhost:5000';
+const API_BASE_URL = rawBase.replace(/\/+$/, '').replace(/\/api$/, '');
 
 export class ApiError extends Error {
   readonly status: number;

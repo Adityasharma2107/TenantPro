@@ -33,5 +33,6 @@ postman/ # API request collection
 - [x] Team management and ticket workflow APIs added (Day 4)
 - [x] React Router, Tailwind design system, authentication screens, and manager dashboard shell added (Day 5)
 - [x] Secure frontend sign-in, manager registration, React Query, and live dashboard ticket data added (Day 6)
-- [ ] Ticket pages and real-time updates (Day 7-10)
-- [ ] Tests, CI/CD, Docker, and deployment (Day 10-14)
+- [x] Ticket list with search/filters, ticket details, comments, audit timeline, and technician assignment (Day 7)
+- [ ] Technician dashboard, resident management, and real-time updates (Day 8-10)
+- [ ] File attachments, testing, CI/CD, Docker, and deployment (Day 11-14)

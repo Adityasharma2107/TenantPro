@@ -224,7 +224,11 @@ export const updateStatus: RequestHandler = async (request, response) => {
   }
 
   ticket.status = result.data.status;
-  ticket.resolvedAt = result.data.status === 'resolved' ? new Date() : undefined;
+  if (result.data.status === 'resolved') {
+    ticket.resolvedAt = ticket.resolvedAt ?? new Date();
+  } else if (result.data.status !== 'closed') {
+    ticket.resolvedAt = undefined;
+  }
   await ticket.save();
 
   const activityType = result.data.status === 'resolved'
