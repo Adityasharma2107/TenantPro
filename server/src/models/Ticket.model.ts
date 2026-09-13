@@ -30,6 +30,8 @@ export interface ITicket {
   assignedTechnician?: Types.ObjectId;
   dueAt?: Date;
   resolvedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 // Stores one maintenance complaint from creation until it is resolved or closed.

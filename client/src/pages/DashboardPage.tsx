@@ -1,20 +1,24 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
+  Activity,
   ArrowUpRight,
   CircleAlert,
   CircleCheck,
   ClipboardList,
   Clock3,
+  Layers,
   Plus,
+  Timer,
+  Wrench,
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CreateTicketModal } from '../components/CreateTicketModal';
 import { MetricCard } from '../components/MetricCard';
 import { PriorityBadge, StatusBadge } from '../components/StatusBadge';
 import { apiRequest } from '../lib/api';
-import { timeAgo } from '../lib/format';
-import type { CurrentUser, Ticket, TicketStatus } from '../types/ticket';
+import { displayStatus, timeAgo } from '../lib/format';
+import type { AnalyticsData, CurrentUser, Ticket, TicketStatus } from '../types/ticket';
 
 export function DashboardPage() {
   const navigate = useNavigate();
@@ -29,6 +33,11 @@ export function DashboardPage() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['tickets'],
     queryFn: () => apiRequest<{ tickets: Ticket[] }>('/api/tickets?limit=100'),
+  });
+
+  const { data: analytics } = useQuery({
+    queryKey: ['analytics'],
+    queryFn: () => apiRequest<AnalyticsData>('/api/analytics'),
   });
 
   const tickets = data?.tickets ?? [];
@@ -62,6 +71,9 @@ export function DashboardPage() {
       </div>
     );
   }
+
+  const categoryBreakdown = analytics?.byCategory ?? {};
+  const maxCategoryCount = Math.max(1, ...Object.values(categoryBreakdown));
 
   return (
     <>
@@ -145,11 +157,15 @@ export function DashboardPage() {
               tone="bg-blue-50 text-[#30AFFF]"
             />
             <MetricCard
-              label="Urgent issues"
-              value={String(tickets.filter((t) => t.priority === 'urgent').length)}
-              detail="Immediate attention"
-              icon={CircleAlert}
-              tone="bg-rose-50 text-rose-600"
+              label="Avg resolution speed"
+              value={
+                analytics?.summary.avgResolutionHours
+                  ? `${analytics.summary.avgResolutionHours} hrs`
+                  : 'N/A'
+              }
+              detail="Turnaround time"
+              icon={Timer}
+              tone="bg-teal-50 text-teal-600"
             />
             <MetricCard
               label="In progress"
@@ -159,10 +175,10 @@ export function DashboardPage() {
               tone="bg-amber-50 text-amber-600"
             />
             <MetricCard
-              label="Resolved"
-              value={String(count('resolved'))}
-              detail="Resolved tickets"
-              icon={CircleCheck}
+              label="Property health"
+              value={`${analytics?.summary.healthScore ?? 100}%`}
+              detail="Completed repairs"
+              icon={Activity}
               tone="bg-emerald-50 text-emerald-600"
             />
           </>
@@ -281,12 +297,85 @@ export function DashboardPage() {
               Property health
             </p>
             <p className="mt-1 text-sm font-medium text-[#18122B]">
-              {tickets.length
-                ? `${Math.round((count('resolved') / tickets.length) * 100)}% of tickets resolved.`
+              {analytics?.summary.healthScore !== undefined
+                ? `${analytics.summary.healthScore}% of all maintenance requests resolved.`
                 : 'Create your first ticket to begin tracking property health.'}
             </p>
           </div>
         </article>
+      </section>
+
+      {/* Operational Analytics & Workload Breakdown */}
+      <section className="mt-6 grid gap-6 xl:grid-cols-[1fr_1fr]">
+        {/* Category Breakdown */}
+        <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center gap-2">
+            <Layers size={18} className="text-[#635985]" />
+            <h2 className="font-semibold text-[#18122B]">Tickets by Category</h2>
+          </div>
+          <p className="mt-1 text-sm text-slate-500">Distribution of reported maintenance trades</p>
+
+          <div className="mt-6 space-y-3.5">
+            {Object.entries(categoryBreakdown).map(([category, countVal]) => (
+              <div key={category}>
+                <div className="mb-1 flex justify-between text-xs">
+                  <span className="font-medium text-slate-600">{displayStatus(category)}</span>
+                  <span className="font-bold text-slate-800">{countVal}</span>
+                </div>
+                <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                  <div
+                    style={{ width: `${(countVal / maxCategoryCount) * 100}%` }}
+                    className="h-full rounded-full bg-[#635985]/80 transition-all duration-500"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        {/* Technician Efficiency Leaderboard (for managers) */}
+        {user?.role === 'manager' && (
+          <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="flex items-center gap-2">
+              <Wrench size={18} className="text-[#635985]" />
+              <h2 className="font-semibold text-[#18122B]">Technician Dispatch Efficiency</h2>
+            </div>
+            <p className="mt-1 text-sm text-slate-500">Completed repairs vs active assignments</p>
+
+            <div className="mt-6 space-y-4">
+              {analytics?.technicianLeaderboard?.length ? (
+                analytics.technicianLeaderboard.map((tech) => (
+                  <div
+                    key={tech.id}
+                    className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/60 p-3.5"
+                  >
+                    <div>
+                      <p className="text-sm font-bold text-[#18122B]">{tech.name}</p>
+                      <p className="text-xs text-slate-400">
+                        {tech.specialization || 'General Maintenance'}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-4 text-xs">
+                      <div className="text-right">
+                        <span className="block font-bold text-amber-700">{tech.activeCount} active</span>
+                        <span className="text-[11px] text-slate-400">assigned</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="block font-bold text-emerald-700">{tech.resolvedCount} done</span>
+                        <span className="text-[11px] text-slate-400">resolved</span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="py-8 text-center text-xs text-slate-400">
+                  No active technicians found. Onboard technicians to track dispatch velocity.
+                </p>
+              )}
+            </div>
+          </article>
+        )}
       </section>
 
       <CreateTicketModal

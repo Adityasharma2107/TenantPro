@@ -104,3 +104,26 @@ export interface TeamMember {
   specialization?: string;
   isActive: boolean;
 }
+
+export interface AnalyticsData {
+  summary: {
+    totalTickets: number;
+    openTickets: number;
+    inProgressTickets: number;
+    resolvedTickets: number;
+    closedTickets: number;
+    avgResolutionHours: number;
+    healthScore: number;
+  };
+  byStatus: Record<string, number>;
+  byPriority: Record<string, number>;
+  byCategory: Record<string, number>;
+  technicianLeaderboard: Array<{
+    id: string;
+    name: string;
+    specialization?: string;
+    activeCount: number;
+    resolvedCount: number;
+  }>;
+}
+

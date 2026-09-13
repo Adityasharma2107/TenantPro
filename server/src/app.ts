@@ -4,14 +4,21 @@ import express from 'express';
 import helmet from 'helmet';
 
 import { errorHandler, notFoundHandler } from './middlewares/error.middleware.js';
+import { apiRateLimiter } from './middlewares/rate-limit.middleware.js';
+import analyticsRouter from './routes/analytics.routes.js';
 import authRouter from './routes/auth.routes.js';
 import teamRouter from './routes/team.routes.js';
 import ticketRouter from './routes/ticket.routes.js';
+import uploadRouter from './routes/upload.routes.js';
 
 const app = express();
 
-// Adds security-related HTTP response headers to every API response.
-app.use(helmet());
+// Adds security-related HTTP response headers, permitting cross-origin media rendering.
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  }),
+);
 
 // Allows the React application to call this API and send authentication cookies later.
 app.use(
@@ -20,6 +27,9 @@ app.use(
     credentials: true,
   }),
 );
+
+// Global rate limiter across API paths to mitigate abuse.
+app.use('/api', apiRateLimiter);
 
 // Converts JSON request bodies into JavaScript objects for API routes.
 app.use(express.json());
@@ -43,6 +53,12 @@ app.use('/api/team', teamRouter);
 
 // Holds the property-maintenance workflow from ticket creation through resolution.
 app.use('/api/tickets', ticketRouter);
+
+// Handles media attachments via Cloudinary with image validation.
+app.use('/api/upload', uploadRouter);
+
+// Computes operational metrics, turnaround speeds, and performance breakdowns.
+app.use('/api/analytics', analyticsRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

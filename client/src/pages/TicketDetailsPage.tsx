@@ -5,11 +5,13 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
+  Image as ImageIcon,
   MapPin,
   MessageSquare,
   Send,
   User,
   Wrench,
+  X,
 } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { AssignTechnicianModal } from '../components/AssignTechnicianModal';
@@ -33,6 +35,7 @@ export function TicketDetailsPage() {
 
   const [commentText, setCommentText] = useState('');
   const [isAssignOpen, setIsAssignOpen] = useState(false);
+  const [activeLightboxUrl, setActiveLightboxUrl] = useState<string | null>(null);
   const [actionError, setActionError] = useState('');
 
   // 1. Current Session
@@ -231,6 +234,33 @@ export function TicketDetailsPage() {
                     dateStyle: 'medium',
                   })}
                 </span>
+              </div>
+            )}
+
+            {ticket.imageUrls && ticket.imageUrls.length > 0 && (
+              <div className="mt-6 border-t border-slate-100 pt-5">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  <ImageIcon size={14} className="text-[#635985]" />
+                  <span>Attached Photos ({ticket.imageUrls.length})</span>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-3">
+                  {ticket.imageUrls.map((url, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setActiveLightboxUrl(url)}
+                      className="group relative size-24 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 shadow-sm transition hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#635985]"
+                      title="Click to view full size"
+                    >
+                      <img
+                        src={url}
+                        alt={`Attachment ${idx + 1}`}
+                        className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                      <span className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
           </article>
@@ -448,6 +478,25 @@ export function TicketDetailsPage() {
         currentTechnicianId={assignedTech?._id}
         onClose={() => setIsAssignOpen(false)}
       />
+
+      {/* Lightbox Modal */}
+      {activeLightboxUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#18122B]/85 backdrop-blur-sm">
+          <button
+            type="button"
+            onClick={() => setActiveLightboxUrl(null)}
+            className="absolute top-5 right-5 rounded-xl bg-white/10 p-2.5 text-white hover:bg-white/20 transition-colors"
+            aria-label="Close image preview"
+          >
+            <X size={24} />
+          </button>
+          <img
+            src={activeLightboxUrl}
+            alt="Full size attachment"
+            className="max-h-[85vh] max-w-[90vw] rounded-2xl object-contain shadow-2xl"
+          />
+        </div>
+      )}
     </div>
   );
 }

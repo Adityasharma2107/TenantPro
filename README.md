@@ -36,4 +36,6 @@ postman/ # API request collection
 - [x] Ticket list with search/filters, ticket details, comments, audit timeline, and technician assignment (Day 7)
 - [x] Resident onboarding directory and technician roster management (Day 8)
 - [x] Real-time updates with Socket.io for tickets, status, assignments, and comments (Day 9-10)
-- [ ] File attachments with Cloudinary, analytics, testing, and deployment (Day 11-14)
+- [x] File attachments via Cloudinary and operational analytics dashboard (Day 11-12)
+- [ ] Testing, Docker, CI/CD, and deployment polish (Day 13-14)
+
