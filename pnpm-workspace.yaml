@@ -6,3 +6,4 @@ allowBuilds:
   # TenantPro uses bcryptjs, so native bcrypt build scripts are intentionally disabled.
   bcrypt: false
   esbuild: true
+  mongodb-memory-server: set this to true or false
