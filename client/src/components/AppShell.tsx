@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { NavLink, Navigate, useNavigate } from 'react-router-dom';
 import { apiRequest } from '../lib/api';
+import { disconnectSocket } from '../lib/socket';
+import { useRealtimeTickets } from '../hooks/useRealtimeTickets';
 import type { CurrentUser } from '../types/ticket';
 import { Brand } from './Brand';
 import { CreateTicketModal } from './CreateTicketModal';
@@ -42,9 +44,13 @@ export function AppShell({ children }: AppShellProps) {
     queryFn: () => apiRequest<{ user: CurrentUser }>('/api/auth/me'),
   });
 
+  // Enable live real-time synchronization when session is loaded
+  useRealtimeTickets(Boolean(session?.user));
+
   const logout = useMutation({
     mutationFn: () => apiRequest<{ message: string }>('/api/auth/logout', { method: 'POST' }),
     onSettled: () => {
+      disconnectSocket();
       queryClient.removeQueries({ queryKey: ['current-user'] });
       queryClient.removeQueries({ queryKey: ['tickets'] });
       navigate('/login');
