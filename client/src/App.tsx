@@ -3,6 +3,8 @@ import { AppShell } from './components/AppShell';
 import { AuthPage } from './pages/AuthPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
+import { ResidentsPage } from './pages/ResidentsPage';
+import { TechniciansPage } from './pages/TechniciansPage';
 import { TicketDetailsPage } from './pages/TicketDetailsPage';
 import { TicketsPage } from './pages/TicketsPage';
 
@@ -22,8 +24,8 @@ function App() {
               <Route path="dashboard" element={<DashboardPage />} />
               <Route path="tickets" element={<TicketsPage />} />
               <Route path="tickets/:ticketId" element={<TicketDetailsPage />} />
-              <Route path="residents" element={<PlaceholderPage />} />
-              <Route path="technicians" element={<PlaceholderPage />} />
+              <Route path="residents" element={<ResidentsPage />} />
+              <Route path="technicians" element={<TechniciansPage />} />
               <Route path="property" element={<PlaceholderPage />} />
               <Route path="settings" element={<PlaceholderPage />} />
               <Route path="*" element={<Navigate to="dashboard" replace />} />
