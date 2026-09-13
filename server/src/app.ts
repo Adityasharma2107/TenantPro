@@ -20,10 +20,20 @@ app.use(
   }),
 );
 
+const getAllowedOrigins = (): string[] => {
+  if (!process.env.CLIENT_URL) return ['http://localhost:5173'];
+  return process.env.CLIENT_URL.split(',').map((url) => url.trim());
+};
+
 // Allows the React application to call this API and send authentication cookies later.
 app.use(
   cors({
-    origin: process.env.CLIENT_URL ?? 'http://localhost:5173',
+    origin: (origin, callback) => {
+      if (!origin || getAllowedOrigins().includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(null, false);
+    },
     credentials: true,
   }),
 );

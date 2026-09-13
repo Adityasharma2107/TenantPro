@@ -3,10 +3,14 @@ import type { CookieOptions } from 'express';
 // The cookie name is kept in one place so login and logout always use the same name.
 export const AUTH_COOKIE_NAME = 'tenantpro_access_token';
 
+const isProduction = process.env.NODE_ENV === 'production';
+const configuredSameSite = process.env.COOKIE_SAME_SITE as CookieOptions['sameSite'];
+const sameSite: CookieOptions['sameSite'] = configuredSameSite ?? (isProduction ? 'none' : 'lax');
+
 const cookieBaseOptions: CookieOptions = {
   httpOnly: true,
-  sameSite: 'lax',
-  secure: process.env.NODE_ENV === 'production',
+  sameSite,
+  secure: isProduction || sameSite === 'none',
 };
 
 // Browsers keep a successful login for seven days unless the user logs out sooner.

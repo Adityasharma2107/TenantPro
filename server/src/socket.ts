@@ -7,10 +7,20 @@ import { verifyAccessToken, type AuthenticatedUser } from './utils/auth-token.js
 
 let io: SocketIOServer | null = null;
 
+const getAllowedOrigins = (): string[] => {
+  if (!process.env.CLIENT_URL) return ['http://localhost:5173'];
+  return process.env.CLIENT_URL.split(',').map((url) => url.trim());
+};
+
 export const initSocketServer = (httpServer: HttpServer): SocketIOServer => {
   io = new SocketIOServer(httpServer, {
     cors: {
-      origin: process.env.CLIENT_URL ?? 'http://localhost:5173',
+      origin: (origin, callback) => {
+        if (!origin || getAllowedOrigins().includes(origin)) {
+          return callback(null, true);
+        }
+        return callback(new Error('Origin not allowed by Socket.io CORS'), false);
+      },
       credentials: true,
     },
   });
