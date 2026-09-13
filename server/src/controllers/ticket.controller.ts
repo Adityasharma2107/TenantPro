@@ -14,6 +14,11 @@ import {
   updatePrioritySchema,
   updateStatusSchema,
 } from '../validations/ticket.validation.js';
+import {
+  emitCommentAdded,
+  emitTicketCreated,
+  emitTicketUpdated,
+} from '../socket.js';
 
 const technicianStatuses: TicketStatus[] = ['in_progress', 'resolved'];
 
@@ -82,6 +87,8 @@ export const createTicket: RequestHandler = async (request, response) => {
   });
 
   await addActivity(ticket._id, request.user!.userId, 'ticket_created', 'Tenant reported this maintenance issue.');
+
+  emitTicketCreated(request.user!.propertyId, ticket);
 
   return response.status(201).json({ message: 'Ticket created successfully.', ticket });
 };
@@ -185,6 +192,8 @@ export const assignTechnician: RequestHandler = async (request, response) => {
 
   await addActivity(ticket._id, request.user!.userId, 'ticket_assigned', `Assigned to ${technician.name}.`);
 
+  emitTicketUpdated(ticket.property.toString(), ticket);
+
   return response.status(200).json({ message: 'Technician assigned successfully.', ticket });
 };
 
@@ -202,6 +211,8 @@ export const updatePriority: RequestHandler = async (request, response) => {
   ticket.priority = result.data.priority;
   await ticket.save();
   await addActivity(ticket._id, request.user!.userId, 'ticket_updated', `Priority changed to ${result.data.priority}.`);
+
+  emitTicketUpdated(ticket.property.toString(), ticket);
 
   return response.status(200).json({ message: 'Ticket priority updated successfully.', ticket });
 };
@@ -238,6 +249,8 @@ export const updateStatus: RequestHandler = async (request, response) => {
       : 'status_changed';
   await addActivity(ticket._id, request.user!.userId, activityType, `Status changed to ${result.data.status}.`);
 
+  emitTicketUpdated(ticket.property.toString(), ticket);
+
   return response.status(200).json({ message: 'Ticket status updated successfully.', ticket });
 };
 
@@ -259,5 +272,8 @@ export const addComment: RequestHandler = async (request, response) => {
   });
   await addActivity(ticket._id, request.user!.userId, 'comment_added', 'Added a comment.');
 
-  return response.status(201).json({ message: 'Comment added successfully.', comment });
+  const populatedComment = await comment.populate('author', 'name role');
+  emitCommentAdded(ticket.property.toString(), ticket._id.toString(), populatedComment);
+
+  return response.status(201).json({ message: 'Comment added successfully.', comment: populatedComment });
 };
