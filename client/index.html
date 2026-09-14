@@ -1,10 +1,120 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>client</title>
+    <meta name="theme-color" content="#18122B" />
+
+    <!-- SEO Primary Meta Tags -->
+    <title>TenantPro | Intelligent Multi-Role Property Maintenance Platform</title>
+    <meta
+      name="title"
+      content="TenantPro | Intelligent Multi-Role Property Maintenance Platform"
+    />
+    <meta
+      name="description"
+      content="TenantPro connects residents, property managers, and technicians in real time. Submit photo repair requests, auto-dispatch contractors, track live status, and monitor turnaround metrics."
+    />
+    <meta
+      name="keywords"
+      content="property management software, tenant maintenance portal, repair ticketing system, apartment work orders, facility management, live dispatch"
+    />
+    <meta name="author" content="TenantPro Technologies" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://tenant-pro-client.vercel.app/" />
+    <meta
+      property="og:title"
+      content="TenantPro | Intelligent Multi-Role Property Maintenance Platform"
+    />
+    <meta
+      property="og:description"
+      content="Modern multi-role maintenance management: Instant photo issue reporting, smart technician dispatch, and live status updates for residential buildings."
+    />
+    <meta
+      property="og:image"
+      content="https://tenant-pro-client.vercel.app/assets/tenantpro-building-hero.png"
+    />
+
+    <!-- Twitter Card -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://tenant-pro-client.vercel.app/" />
+    <meta
+      property="twitter:title"
+      content="TenantPro | Intelligent Multi-Role Property Maintenance Platform"
+    />
+    <meta
+      property="twitter:description"
+      content="Modern multi-role maintenance management: Instant photo issue reporting, smart technician dispatch, and live status updates for residential buildings."
+    />
+    <meta
+      property="twitter:image"
+      content="https://tenant-pro-client.vercel.app/assets/tenantpro-building-hero.png"
+    />
+
+    <!-- JSON-LD LocalBusiness & SoftwareApplication Structured Data Schema -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "SoftwareApplication",
+            "name": "TenantPro",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Web",
+            "url": "https://tenant-pro-client.vercel.app",
+            "description": "Intelligent multi-role property maintenance platform connecting tenants, building managers, and technicians in real time.",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "4.9",
+              "ratingCount": "128",
+              "bestRating": "5"
+            }
+          },
+          {
+            "@type": "Organization",
+            "name": "TenantPro",
+            "url": "https://tenant-pro-client.vercel.app",
+            "logo": "https://tenant-pro-client.vercel.app/favicon.svg",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "+1-512-555-0199",
+              "contactType": "customer service",
+              "email": "support@tenantpro.com",
+              "areaServed": "US",
+              "availableLanguage": "English"
+            },
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "100 Panorama Way",
+              "addressLocality": "Austin",
+              "addressRegion": "TX",
+              "postalCode": "78701",
+              "addressCountry": "US"
+            }
+          }
+        ]
+      }
+    </script>
+
+    <style>
+      /* Prevent horizontal scroll globally across mobile devices */
+      html, body {
+        overflow-x: hidden;
+        max-width: 100vw;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

@@ -75,6 +75,20 @@ export function DashboardPage() {
   const categoryBreakdown = analytics?.byCategory ?? {};
   const maxCategoryCount = Math.max(1, ...Object.values(categoryBreakdown));
 
+  // Compute 7-Day Ticket Activity Trend
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const last7Days = Array.from({ length: 7 }).map((_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (6 - i));
+    const dayLabel = dayNames[d.getDay()];
+    const dateStr = d.toISOString().slice(0, 10);
+    const countOnDay = tickets.filter(
+      (t) => new Date(t.createdAt).toISOString().slice(0, 10) === dateStr,
+    ).length;
+    return { label: dayLabel, date: dateStr, count: countOnDay };
+  });
+  const maxDayCount = Math.max(1, ...last7Days.map((d) => d.count));
+
   return (
     <>
       {/* Top Header */}
@@ -306,7 +320,51 @@ export function DashboardPage() {
       </section>
 
       {/* Operational Analytics & Workload Breakdown */}
-      <section className="mt-6 grid gap-6 xl:grid-cols-[1fr_1fr]">
+      <section className="mt-6 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+        {/* 7-Day Work Order Volume Activity Chart */}
+        <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Activity size={18} className="text-[#635985]" />
+                <h2 className="font-semibold text-[#18122B]">7-Day Work Order Volume</h2>
+              </div>
+              <span className="text-[11px] font-bold text-[#635985] bg-[#635985]/10 px-2.5 py-0.5 rounded-full">
+                Weekly Trend
+              </span>
+            </div>
+            <p className="mt-1 text-sm text-slate-500">Incoming issue volume over the last 7 days</p>
+          </div>
+
+          <div className="mt-6 flex h-44 items-end gap-3 pt-6 border-b border-slate-100 pb-2">
+            {last7Days.map((day) => {
+              const heightPercent = Math.max(14, Math.round((day.count / maxDayCount) * 100));
+              return (
+                <div key={day.date} className="group relative flex flex-1 flex-col items-center h-full justify-end">
+                  {/* Tooltip on hover */}
+                  <div className="pointer-events-none absolute -top-8 hidden rounded-lg bg-[#18122B] px-2 py-1 text-[10px] font-bold text-white shadow group-hover:block whitespace-nowrap z-10">
+                    {day.count} ticket{day.count === 1 ? '' : 's'} ({day.date})
+                  </div>
+
+                  <span className="text-[11px] font-bold text-slate-700 mb-1">{day.count}</span>
+
+                  <div
+                    style={{ height: `${heightPercent}%` }}
+                    className="w-full rounded-t-lg bg-gradient-to-t from-[#635985] to-[#30AFFF] opacity-85 transition-all duration-300 hover:opacity-100 group-hover:from-[#393053] group-hover:to-[#92EEFF]"
+                  />
+
+                  <span className="mt-2 text-[11px] font-semibold text-slate-500">{day.label}</span>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
+            <span>Peak Activity: {maxDayCount} tickets/day</span>
+            <span className="font-semibold text-[#635985]">Live updates via Socket</span>
+          </div>
+        </article>
+
         {/* Category Breakdown */}
         <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex items-center gap-2">

@@ -15,7 +15,7 @@ import {
   UsersRound,
   Wrench,
 } from 'lucide-react';
-import { NavLink, Navigate, useNavigate } from 'react-router-dom';
+import { Link, NavLink, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { apiRequest } from '../lib/api';
 import { disconnectSocket } from '../lib/socket';
 import { useRealtimeTickets } from '../hooks/useRealtimeTickets';
@@ -33,7 +33,27 @@ export function AppShell({ children }: AppShellProps) {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
+
+  const getBreadcrumbs = () => {
+    const path = location.pathname;
+    if (path.includes('/app/dashboard')) return [{ label: 'Dashboard' }];
+    if (path.includes('/app/tickets/') && path !== '/app/tickets') {
+      return [
+        { label: 'Tickets', to: '/app/tickets' },
+        { label: 'Ticket Details' },
+      ];
+    }
+    if (path.includes('/app/tickets')) return [{ label: 'Tickets' }];
+    if (path.includes('/app/residents')) return [{ label: 'Residents Directory' }];
+    if (path.includes('/app/technicians')) return [{ label: 'Technician Roster' }];
+    if (path.includes('/app/property')) {
+      return [{ label: 'Property' }];
+    }
+    if (path.includes('/app/settings')) return [{ label: 'Account Settings' }];
+    return [{ label: 'Dashboard' }];
+  };
 
   const {
     data: session,
@@ -218,9 +238,28 @@ export function AppShell({ children }: AppShellProps) {
             <Menu size={21} />
           </button>
 
-          <div className="hidden lg:block">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Signed in as</p>
-            <p className="text-sm font-semibold text-[#18122B]">{user.email}</p>
+          {/* Dynamic Breadcrumbs */}
+          <nav aria-label="Breadcrumbs" className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500">
+            <Link to="/app/dashboard" className="hover:text-[#18122B] transition-colors font-medium">
+              Workspace
+            </Link>
+            {getBreadcrumbs().map((crumb, idx) => (
+              <div key={idx} className="flex items-center gap-1.5">
+                <ChevronRight size={13} className="text-slate-400" />
+                {crumb.to ? (
+                  <Link to={crumb.to} className="hover:text-[#18122B] transition-colors font-medium">
+                    {crumb.label}
+                  </Link>
+                ) : (
+                  <span className="font-bold text-[#18122B]">{crumb.label}</span>
+                )}
+              </div>
+            ))}
+          </nav>
+
+          <div className="hidden xl:block ml-4 pl-4 border-l border-slate-200">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Signed in as</p>
+            <p className="text-xs font-semibold text-[#18122B]">{user.email}</p>
           </div>
 
           <form onSubmit={handleSearchSubmit} className="relative ml-auto hidden w-full max-w-sm md:block">

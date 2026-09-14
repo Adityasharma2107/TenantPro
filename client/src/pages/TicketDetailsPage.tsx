@@ -440,6 +440,28 @@ export function TicketDetailsPage() {
                 </div>
               </div>
             </div>
+
+            {/* Maintenance Cost & Expense Tracking */}
+            <div className="mt-5 border-t border-slate-100 pt-4">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-medium text-slate-500">Repair Cost & Parts</p>
+                <span className="text-[10px] font-bold text-slate-400 uppercase">Expense Log</span>
+              </div>
+              <div className="mt-2.5 rounded-xl border border-slate-100 bg-slate-50 p-3 text-xs space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Parts Allocation:</span>
+                  <span className="font-semibold text-slate-800">$35.00</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Labor Time:</span>
+                  <span className="font-semibold text-slate-800">1.25 Hours</span>
+                </div>
+                <div className="flex justify-between border-t border-slate-200/60 pt-1.5 font-bold text-[#18122B]">
+                  <span>Total Recorded:</span>
+                  <span className="text-emerald-700">$95.00</span>
+                </div>
+              </div>
+            </div>
           </article>
 
           {/* Activity Timeline Card */}

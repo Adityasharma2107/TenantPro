@@ -83,6 +83,24 @@ export function SettingsPage() {
     }
   };
 
+  const handleRequestNotification = async () => {
+    if (typeof window === 'undefined' || !('Notification' in window)) return;
+    if (Notification.permission === 'granted') {
+      new Notification('TenantPro Workspace', {
+        body: 'Real-time push notifications are active for work orders.',
+        icon: '/favicon.svg',
+      });
+      return;
+    }
+    const res = await Notification.requestPermission();
+    if (res === 'granted') {
+      new Notification('TenantPro Workspace', {
+        body: 'Notifications enabled successfully!',
+        icon: '/favicon.svg',
+      });
+    }
+  };
+
   // Profile Update Mutation
   const profileMutation = useMutation({
     mutationFn: (payload: { name: string; unitNumber?: string; specialization?: string }) =>
@@ -541,6 +559,25 @@ export function SettingsPage() {
                 />
               </button>
             </div>
+
+            {/* Desktop Notification Permission */}
+            <div className="mt-4 rounded-xl border border-slate-100 bg-slate-50 p-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-xs font-bold text-[#18122B]">Browser Desktop Alerts</p>
+                  <p className="text-[11px] text-slate-500">
+                    Receive native popups on your device when work orders change.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleRequestNotification}
+                  className="rounded-xl bg-[#635985] px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-[#393053] transition"
+                >
+                  Enable / Test Alerts
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -561,6 +598,13 @@ export function SettingsPage() {
               <div className="flex items-center justify-between rounded-xl bg-slate-50 p-3">
                 <span className="font-medium text-slate-500">Account Role</span>
                 <span className="font-bold capitalize text-[#18122B]">{user?.role}</span>
+              </div>
+              <div className="flex items-center justify-between rounded-xl bg-slate-50 p-3">
+                <span className="font-medium text-slate-500">Theme Appearance</span>
+                <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5 text-xs font-semibold">
+                  <span className="rounded-md bg-[#635985] px-2 py-0.5 text-white shadow-sm">Light</span>
+                  <span className="px-2 py-0.5 text-slate-400">Dark (Auto)</span>
+                </div>
               </div>
               <div className="flex items-center justify-between rounded-xl bg-slate-50 p-3">
                 <span className="font-medium text-slate-500">Account ID</span>

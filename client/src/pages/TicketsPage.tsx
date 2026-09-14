@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import {
   ChevronLeft,
   ChevronRight,
+  Download,
   Filter,
   Plus,
   Search,
@@ -73,6 +74,32 @@ export function TicketsPage() {
     setSearchParams(next);
   };
 
+  const handleExportCsv = () => {
+    if (!tickets.length) return;
+
+    const headers = ['Ticket ID', 'Title', 'Category', 'Priority', 'Status', 'Location', 'Created At'];
+    const rows = tickets.map((t) => [
+      `"${t._id}"`,
+      `"${t.title.replace(/"/g, '""')}"`,
+      `"${t.category}"`,
+      `"${t.priority}"`,
+      `"${t.status}"`,
+      `"${(t.location || '').replace(/"/g, '""')}"`,
+      `"${new Date(t.createdAt).toLocaleDateString()}"`,
+    ]);
+
+    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `TenantPro-Tickets-Report-${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6">
       {/* Top Header */}
@@ -88,14 +115,25 @@ export function TicketsPage() {
           </p>
         </div>
 
-        {user?.role === 'tenant' && (
+        <div className="flex flex-wrap items-center gap-3">
           <button
-            onClick={() => setIsCreateOpen(true)}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#635985] px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-[#635985]/20 hover:bg-[#393053]"
+            onClick={handleExportCsv}
+            disabled={!tickets.length}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-[#18122B] shadow-sm hover:bg-slate-50 disabled:opacity-40 transition"
+            title="Download CSV report of current tickets"
           >
-            <Plus size={18} /> Report an Issue
+            <Download size={16} /> Export to CSV
           </button>
-        )}
+
+          {user?.role === 'tenant' && (
+            <button
+              onClick={() => setIsCreateOpen(true)}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#635985] px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-[#635985]/20 hover:bg-[#393053]"
+            >
+              <Plus size={18} /> Report an Issue
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Filter and Search Bar */}
