@@ -120,7 +120,6 @@ export const runSeed = async () => {
       actor: tenant1._id,
       type: 'ticket_created',
       description: 'Reported kitchen sink leak.',
-      createdAt: twoHoursAgo,
     });
 
     // Ticket 2: Electrical Hazard (Assigned)
@@ -145,7 +144,6 @@ export const runSeed = async () => {
       actor: tenant2._id,
       type: 'ticket_created',
       description: 'Reported breaker tripping issue.',
-      createdAt: oneDayAgo,
     });
 
     await ActivityLog.create({
@@ -153,21 +151,18 @@ export const runSeed = async () => {
       actor: manager._id,
       type: 'ticket_assigned',
       description: `Assigned to ${techElectric.name}.`,
-      createdAt: new Date(oneDayAgo.getTime() + 30 * 60 * 1000),
     });
 
     await Comment.create({
       ticket: ticket2._id,
       author: manager._id,
       message: 'David, please inspect the bedroom circuit breaker load today.',
-      createdAt: new Date(oneDayAgo.getTime() + 45 * 60 * 1000),
     });
 
     await Comment.create({
       ticket: ticket2._id,
       author: techElectric._id,
       message: 'On it. Will drop by at 3:00 PM with a multimeter.',
-      createdAt: new Date(oneDayAgo.getTime() + 60 * 60 * 1000),
     });
 
     // Ticket 3: HVAC (In Progress)
@@ -192,7 +187,6 @@ export const runSeed = async () => {
       actor: tenant1._id,
       type: 'ticket_created',
       description: 'Tenant reported AC issue.',
-      createdAt: oneDayAgo,
     });
 
     await ActivityLog.create({
@@ -200,7 +194,6 @@ export const runSeed = async () => {
       actor: manager._id,
       type: 'ticket_assigned',
       description: `Assigned to ${techElectric.name}.`,
-      createdAt: new Date(oneDayAgo.getTime() + 2 * 3600 * 1000),
     });
 
     await ActivityLog.create({
@@ -208,7 +201,6 @@ export const runSeed = async () => {
       actor: techElectric._id,
       type: 'status_changed',
       description: 'Technician started inspection.',
-      createdAt: new Date(now - 3 * 3600 * 1000),
     });
 
     // Ticket 4: Plumbing (Resolved)
@@ -234,7 +226,6 @@ export const runSeed = async () => {
       actor: tenant2._id,
       type: 'ticket_created',
       description: 'Tenant reported leaky faucet valve.',
-      createdAt: threeDaysAgo,
     });
 
     await ActivityLog.create({
@@ -242,7 +233,6 @@ export const runSeed = async () => {
       actor: techPlumber._id,
       type: 'ticket_resolved',
       description: 'Replaced hot water ceramic cartridge and O-ring seal. Leak resolved.',
-      createdAt: new Date(now - 5 * 3600 * 1000),
     });
 
     // Ticket 5: Security / Gate (Closed)
@@ -266,7 +256,6 @@ export const runSeed = async () => {
       actor: techPlumber._id,
       type: 'ticket_resolved',
       description: 'Cleaned magnetic contact strike plate and adjusted alignment.',
-      createdAt: new Date(now - 20 * 3600 * 1000),
     });
 
     await ActivityLog.create({
@@ -274,7 +263,6 @@ export const runSeed = async () => {
       actor: manager._id,
       type: 'ticket_closed',
       description: 'Ticket closed after tenant confirmed smooth gate operation.',
-      createdAt: new Date(now - 12 * 3600 * 1000),
     });
 
     console.log('✅ SEED COMPLETED SUCCESSFULLY!');

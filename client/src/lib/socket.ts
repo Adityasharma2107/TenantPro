@@ -1,7 +1,20 @@
 import { io, type Socket } from 'socket.io-client';
 
-const rawBase = import.meta.env.VITE_API_URL ?? 'http://localhost:5000';
-const SOCKET_URL = rawBase.replace(/\/+$/, '').replace(/\/api$/, '');
+const getSocketUrl = (): string => {
+  const envUrl =
+    import.meta.env.VITE_SOCKET_URL ||
+    import.meta.env.VITE_API_URL ||
+    import.meta.env.VITE_API_BASE_URL;
+  if (envUrl) {
+    return envUrl.replace(/\/+$/, '').replace(/\/api$/, '');
+  }
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+    return 'https://tenantpro-c06g.onrender.com';
+  }
+  return 'http://localhost:5000';
+};
+
+const SOCKET_URL = getSocketUrl();
 
 let socket: Socket | null = null;
 

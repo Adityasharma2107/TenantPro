@@ -1,6 +1,16 @@
 // Keeps every browser-to-server request in one place and always includes the secure login cookie.
-const rawBase = import.meta.env.VITE_API_URL ?? 'http://localhost:5000';
-const API_BASE_URL = rawBase.replace(/\/+$/, '').replace(/\/api$/, '');
+const getApiBaseUrl = (): string => {
+  const envUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
+  if (envUrl) {
+    return envUrl.replace(/\/+$/, '').replace(/\/api$/, '');
+  }
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+    return 'https://tenantpro-c06g.onrender.com';
+  }
+  return 'http://localhost:5000';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 export class ApiError extends Error {
   readonly status: number;

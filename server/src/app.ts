@@ -25,11 +25,22 @@ const getAllowedOrigins = (): string[] => {
   return process.env.CLIENT_URL.split(',').map((url) => url.trim());
 };
 
+const isOriginAllowed = (origin: string | undefined): boolean => {
+  if (!origin) return true;
+  const configured = getAllowedOrigins();
+  if (configured.includes(origin)) return true;
+  // Automatically whitelist Vercel deployments and localhost
+  if (origin.endsWith('.vercel.app') || origin.includes('localhost') || origin.includes('127.0.0.1')) {
+    return true;
+  }
+  return false;
+};
+
 // Allows the React application to call this API and send authentication cookies later.
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || getAllowedOrigins().includes(origin)) {
+      if (isOriginAllowed(origin)) {
         return callback(null, true);
       }
       return callback(null, false);
