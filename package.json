@@ -6,6 +6,7 @@
   "scripts": {
     "dev:client": "pnpm --filter tenantpro-client dev",
     "dev:server": "pnpm --filter tenantpro-server dev",
+    "seed": "pnpm --filter tenantpro-server seed",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck"
   }
