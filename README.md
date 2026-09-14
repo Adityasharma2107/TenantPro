@@ -16,6 +16,14 @@ Engineered with a strong emphasis on **system architecture**, **multi-tenant dat
 
 ---
 
+## 🌐 Live Production Deployment
+
+* 🖥️ **Live Web Application**: [https://tenant-pro-client.vercel.app](https://tenant-pro-client.vercel.app)
+* ⚙️ **Backend API Server**: [https://tenantpro-c06g.onrender.com](https://tenantpro-c06g.onrender.com)
+* 🩺 **API Health Probe**: [https://tenantpro-c06g.onrender.com/api/health](https://tenantpro-c06g.onrender.com/api/health)
+
+---
+
 ## 🏛️ System Architecture
 
 ```text
