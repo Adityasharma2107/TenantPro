@@ -9,7 +9,12 @@ import {
 import { Property } from '../models/Property.model.js';
 import { User } from '../models/User.model.js';
 import { createAccessToken } from '../utils/auth-token.js';
-import { loginSchema, registerManagerSchema } from '../validations/auth.validation.js';
+import {
+  changePasswordSchema,
+  loginSchema,
+  registerManagerSchema,
+  updateProfileSchema,
+} from '../validations/auth.validation.js';
 
 // Sends only safe user fields; password hashes must never be returned by an API.
 const toPublicUser = (user: {
@@ -19,6 +24,8 @@ const toPublicUser = (user: {
   role: string;
   property: { toString(): string };
   isActive: boolean;
+  unitNumber?: string;
+  specialization?: string;
 }) => ({
   id: user._id.toString(),
   name: user.name,
@@ -26,6 +33,8 @@ const toPublicUser = (user: {
   role: user.role,
   propertyId: user.property.toString(),
   isActive: user.isActive,
+  unitNumber: user.unitNumber,
+  specialization: user.specialization,
 });
 
 // Creates the first manager account and the property that account manages.
@@ -124,3 +133,68 @@ export const getCurrentUser: RequestHandler = async (request, response) => {
 
   return response.status(200).json({ user: toPublicUser(user) });
 };
+
+// Allows authenticated users to update their display name, unit number, or specialization.
+export const updateProfile: RequestHandler = async (request, response) => {
+  const result = updateProfileSchema.safeParse(request.body);
+
+  if (!result.success) {
+    return response.status(400).json({
+      message: 'Please check your profile details.',
+      errors: result.error.issues.map((issue) => ({
+        field: issue.path.join('.'),
+        message: issue.message,
+      })),
+    });
+  }
+
+  const user = await User.findById(request.user?.userId);
+  if (!user || !user.isActive) {
+    return response.status(401).json({ message: 'User account not found or deactivated.' });
+  }
+
+  const { name, unitNumber, specialization } = result.data;
+  if (name !== undefined) user.name = name;
+  if (unitNumber !== undefined && user.role === 'tenant') user.unitNumber = unitNumber;
+  if (specialization !== undefined && user.role === 'technician') user.specialization = specialization;
+
+  await user.save();
+
+  return response.status(200).json({
+    message: 'Profile updated successfully.',
+    user: toPublicUser(user),
+  });
+};
+
+// Allows authenticated users to change their password securely after verifying their current password.
+export const changePassword: RequestHandler = async (request, response) => {
+  const result = changePasswordSchema.safeParse(request.body);
+
+  if (!result.success) {
+    return response.status(400).json({
+      message: 'Please check your password entries.',
+      errors: result.error.issues.map((issue) => ({
+        field: issue.path.join('.'),
+        message: issue.message,
+      })),
+    });
+  }
+
+  const { currentPassword, newPassword } = result.data;
+  const user = await User.findById(request.user?.userId).select('+passwordHash');
+
+  if (!user || !user.isActive) {
+    return response.status(401).json({ message: 'User account not found or deactivated.' });
+  }
+
+  const passwordMatches = await bcrypt.compare(currentPassword, user.passwordHash);
+  if (!passwordMatches) {
+    return response.status(400).json({ message: 'Current password is incorrect.' });
+  }
+
+  user.passwordHash = await bcrypt.hash(newPassword, 12);
+  await user.save();
+
+  return response.status(200).json({ message: 'Password updated successfully.' });
+};
+

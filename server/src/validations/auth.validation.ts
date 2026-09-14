@@ -30,3 +30,15 @@ export const loginSchema = z.object({
   email: z.string().trim().email('Enter a valid email address.'),
   password: z.string().min(1, 'Password is required.'),
 });
+
+export const updateProfileSchema = z.object({
+  name: z.string().trim().min(2, 'Name must contain at least 2 characters.').max(80).optional(),
+  unitNumber: z.string().trim().max(30).optional(),
+  specialization: z.string().trim().max(80).optional(),
+});
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Current password is required.'),
+  newPassword: passwordSchema,
+});
+

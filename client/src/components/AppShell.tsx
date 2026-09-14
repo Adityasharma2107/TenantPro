@@ -91,7 +91,7 @@ export function AppShell({ children }: AppShellProps) {
           { label: 'Technicians', icon: Wrench, to: '/app/technicians' },
           { label: 'Property', icon: Building2, to: '/app/property' },
         ]
-      : []),
+      : [{ label: 'Building Info', icon: Building2, to: '/app/property' }]),
     { label: 'Settings', icon: Settings, to: '/app/settings' },
   ];
 

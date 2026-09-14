@@ -7,6 +7,7 @@ import { errorHandler, notFoundHandler } from './middlewares/error.middleware.js
 import { apiRateLimiter } from './middlewares/rate-limit.middleware.js';
 import analyticsRouter from './routes/analytics.routes.js';
 import authRouter from './routes/auth.routes.js';
+import propertyRouter from './routes/property.routes.js';
 import teamRouter from './routes/team.routes.js';
 import ticketRouter from './routes/ticket.routes.js';
 import uploadRouter from './routes/upload.routes.js';
@@ -68,6 +69,9 @@ app.get('/api/health', (_request, response) => {
 
 // Groups all account-related endpoints under one consistent API path.
 app.use('/api/auth', authRouter);
+
+// Access and manage property info and unit occupancy metrics.
+app.use('/api/property', propertyRouter);
 
 // Managers use this route group to create and list their residents and technicians.
 app.use('/api/team', teamRouter);

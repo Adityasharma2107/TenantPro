@@ -2,8 +2,9 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { AppShell } from './components/AppShell';
 import { AuthPage } from './pages/AuthPage';
 import { DashboardPage } from './pages/DashboardPage';
-import { PlaceholderPage } from './pages/PlaceholderPage';
+import { PropertyPage } from './pages/PropertyPage';
 import { ResidentsPage } from './pages/ResidentsPage';
+import { SettingsPage } from './pages/SettingsPage';
 import { TechniciansPage } from './pages/TechniciansPage';
 import { TicketDetailsPage } from './pages/TicketDetailsPage';
 import { TicketsPage } from './pages/TicketsPage';
@@ -26,8 +27,8 @@ function App() {
               <Route path="tickets/:ticketId" element={<TicketDetailsPage />} />
               <Route path="residents" element={<ResidentsPage />} />
               <Route path="technicians" element={<TechniciansPage />} />
-              <Route path="property" element={<PlaceholderPage />} />
-              <Route path="settings" element={<PlaceholderPage />} />
+              <Route path="property" element={<PropertyPage />} />
+              <Route path="settings" element={<SettingsPage />} />
               <Route path="*" element={<Navigate to="dashboard" replace />} />
             </Routes>
           </AppShell>

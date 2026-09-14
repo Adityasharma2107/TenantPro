@@ -6,6 +6,38 @@ export interface CurrentUser {
   email: string;
   role: UserRole;
   propertyId: string;
+  unitNumber?: string;
+  specialization?: string;
+}
+
+export interface PropertyData {
+  property: {
+    id: string;
+    name: string;
+    address: {
+      line1: string;
+      city: string;
+      state: string;
+      postalCode: string;
+    };
+    unitCount: number;
+    contactEmail?: string;
+    manager?: {
+      _id: string;
+      name: string;
+      email: string;
+    };
+    createdAt?: string;
+    updatedAt?: string;
+  };
+  stats: {
+    totalUnits: number;
+    occupiedUnits: number;
+    vacantUnits: number;
+    occupancyRate: number;
+    technicianCount: number;
+    activeTicketsCount: number;
+  };
 }
 
 export type TicketStatus = 'open' | 'assigned' | 'in_progress' | 'resolved' | 'closed';
