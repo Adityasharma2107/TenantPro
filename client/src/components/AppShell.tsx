@@ -1,7 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  Bell,
   Building2,
   ChevronLeft,
   ChevronRight,
@@ -19,9 +18,11 @@ import { Link, NavLink, Navigate, useLocation, useNavigate } from 'react-router-
 import { apiRequest } from '../lib/api';
 import { disconnectSocket } from '../lib/socket';
 import { useRealtimeTickets } from '../hooks/useRealtimeTickets';
-import type { CurrentUser } from '../types/ticket';
+import type { CurrentUser, ManagedProperty } from '../types/ticket';
 import { Brand } from './Brand';
 import { CreateTicketModal } from './CreateTicketModal';
+import { NotificationDropdown } from './NotificationDropdown';
+import { ThemeToggle } from './ThemeToggle';
 
 interface AppShellProps {
   children?: ReactNode;
@@ -77,6 +78,29 @@ export function AppShell({ children }: AppShellProps) {
     },
   });
 
+  // Manager properties list for active property display & switching
+  const { data: propertiesData } = useQuery({
+    queryKey: ['properties-list'],
+    queryFn: () => apiRequest<{ properties: ManagedProperty[] }>('/api/property/all'),
+    enabled: session?.user?.role === 'manager',
+  });
+
+  const switchPropertyMutation = useMutation({
+    mutationFn: (propertyId: string) =>
+      apiRequest('/api/property/switch', {
+        method: 'POST',
+        body: JSON.stringify({ propertyId }),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['current-user'] });
+      queryClient.invalidateQueries({ queryKey: ['property'] });
+      queryClient.invalidateQueries({ queryKey: ['properties-list'] });
+      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      queryClient.invalidateQueries({ queryKey: ['team'] });
+      queryClient.invalidateQueries({ queryKey: ['analytics'] });
+    },
+  });
+
   if (isSessionLoading) {
     return (
       <div className="grid min-h-screen place-items-center bg-[#F8FAFC] text-[#393053]">
@@ -96,6 +120,9 @@ export function AppShell({ children }: AppShellProps) {
     .slice(0, 2)
     .join('')
     .toUpperCase();
+
+  const activeProperty =
+    propertiesData?.properties?.find((p) => p.isActive) || propertiesData?.properties?.[0];
 
   // Role-specific navigation items
   const navItems = [
@@ -153,14 +180,38 @@ export function AppShell({ children }: AppShellProps) {
         </div>
 
         {!collapsed && (
-          <div className="mt-8 flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-left">
-            <span className="grid size-8 place-items-center rounded-lg bg-[#30AFFF]/15 text-[#92EEFF]">
-              <Building2 size={16} />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm font-semibold text-white">Your property</span>
-              <span className="block text-xs capitalize text-slate-400">{user.role} workspace</span>
-            </span>
+          <div className="mt-8 rounded-xl border border-white/10 bg-white/5 p-3 text-left">
+            <div className="flex items-center gap-3">
+              <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-[#30AFFF]/15 text-[#92EEFF]">
+                <Building2 size={16} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-semibold text-white">
+                  {activeProperty ? activeProperty.name : 'Your property'}
+                </span>
+                <span className="block text-xs capitalize text-slate-400">{user.role} workspace</span>
+              </span>
+            </div>
+
+            {user.role === 'manager' && (propertiesData?.properties?.length ?? 0) > 1 && (
+              <div className="mt-2.5 pt-2 border-t border-white/10">
+                <label className="block text-[10px] font-semibold text-slate-400 mb-1">
+                  Active Property:
+                </label>
+                <select
+                  value={user.propertyId}
+                  onChange={(e) => switchPropertyMutation.mutate(e.target.value)}
+                  disabled={switchPropertyMutation.isPending}
+                  className="w-full rounded-lg bg-black/40 border border-white/15 px-2 py-1.5 text-xs text-white outline-none hover:border-white/30 focus:border-[#92EEFF]"
+                >
+                  {propertiesData?.properties.map((p) => (
+                    <option key={p.id} value={p.id} className="bg-[#18122B] text-white">
+                      {p.name} {p.isActive ? '✓' : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
         )}
 
@@ -281,12 +332,15 @@ export function AppShell({ children }: AppShellProps) {
             </button>
           )}
 
-          <button className="relative rounded-xl p-2.5 text-slate-500 hover:bg-slate-100" aria-label="Notifications">
-            <Bell size={20} />
-            <span className="absolute right-2 top-2 size-2 rounded-full bg-rose-500 ring-2 ring-white" />
-          </button>
-          <div className="grid size-9 place-items-center rounded-full bg-[#393053] text-xs font-bold text-white">
-            {initials}
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <NotificationDropdown />
+            <div
+              className="grid size-10 place-items-center rounded-xl bg-gradient-to-br from-[#18122B] to-[#635985] text-xs font-bold text-white shadow-sm ring-1 ring-slate-200 dark:ring-white/10"
+              title={user.name}
+            >
+              {initials}
+            </div>
           </div>
         </header>
 

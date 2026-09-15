@@ -96,3 +96,11 @@ export const emitCommentAdded = (
 ): void => {
   io?.to(`property:${propertyId}`).emit('ticket:comment_added', { ticketId, comment });
 };
+
+/**
+ * Dispatches a direct real-time notification to a specific user.
+ */
+export const emitNotification = (userId: string, notification: unknown): void => {
+  io?.to(`user:${userId}`).emit('notification:new', { notification });
+};
+

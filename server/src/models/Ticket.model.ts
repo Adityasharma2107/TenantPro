@@ -17,6 +17,15 @@ export type TicketCategory = (typeof ticketCategories)[number];
 export type TicketPriority = (typeof ticketPriorities)[number];
 export type TicketStatus = (typeof ticketStatuses)[number];
 
+export interface ITicketExpense {
+  currency: string;
+  partsCost: number;
+  laborHours: number;
+  laborRate: number;
+  totalCost: number;
+  notes?: string;
+}
+
 export interface ITicket {
   title: string;
   description: string;
@@ -28,6 +37,7 @@ export interface ITicket {
   property: Types.ObjectId;
   tenant: Types.ObjectId;
   assignedTechnician?: Types.ObjectId;
+  expense?: ITicketExpense;
   dueAt?: Date;
   resolvedAt?: Date;
   createdAt: Date;
@@ -48,6 +58,14 @@ const ticketSchema = new Schema<ITicket>(
     property: { type: Schema.Types.ObjectId, ref: 'Property', required: true },
     tenant: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     assignedTechnician: { type: Schema.Types.ObjectId, ref: 'User' },
+    expense: {
+      currency: { type: String, default: '$' },
+      partsCost: { type: Number, default: 0, min: 0 },
+      laborHours: { type: Number, default: 0, min: 0 },
+      laborRate: { type: Number, default: 0, min: 0 },
+      totalCost: { type: Number, default: 0, min: 0 },
+      notes: { type: String, default: '', maxlength: 500 },
+    },
     dueAt: { type: Date },
     resolvedAt: { type: Date },
   },

@@ -8,6 +8,7 @@ import {
   listTickets,
   updatePriority,
   updateStatus,
+  updateTicketExpense,
 } from '../controllers/ticket.controller.js';
 import { authorizeRoles, requireAuth } from '../middlewares/auth.middleware.js';
 
@@ -21,6 +22,7 @@ ticketRouter.get('/:ticketId', getTicketById);
 ticketRouter.patch('/:ticketId/assignment', authorizeRoles('manager'), assignTechnician);
 ticketRouter.patch('/:ticketId/priority', authorizeRoles('manager'), updatePriority);
 ticketRouter.patch('/:ticketId/status', updateStatus);
+ticketRouter.patch('/:ticketId/expense', authorizeRoles('manager', 'technician'), updateTicketExpense);
 ticketRouter.post('/:ticketId/comments', addComment);
 
 export default ticketRouter;

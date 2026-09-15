@@ -59,6 +59,15 @@ export interface PopulatedUser {
   specialization?: string;
 }
 
+export interface TicketExpense {
+  currency: string;
+  partsCost: number;
+  laborHours: number;
+  laborRate: number;
+  totalCost: number;
+  notes?: string;
+}
+
 export interface Ticket {
   _id: string;
   title: string;
@@ -71,6 +80,7 @@ export interface Ticket {
   property: string;
   tenant: PopulatedUser | string;
   assignedTechnician?: PopulatedUser | string;
+  expense?: TicketExpense;
   dueAt?: string;
   resolvedAt?: string;
   createdAt: string;
@@ -132,8 +142,49 @@ export interface TeamMember {
   name: string;
   email: string;
   role: 'tenant' | 'technician';
+  propertyId?: string;
+  propertyName?: string;
   unitNumber?: string;
   specialization?: string;
+  isActive: boolean;
+}
+
+export interface NotificationItem {
+  _id: string;
+  recipient: string;
+  actor?: {
+    _id: string;
+    name: string;
+    email: string;
+    role: string;
+  };
+  ticket?: {
+    _id: string;
+    title: string;
+    location: string;
+    status: TicketStatus;
+    priority: TicketPriority;
+  };
+  type: 'ticket_created' | 'ticket_assigned' | 'status_changed' | 'comment_added' | 'expense_updated';
+  title: string;
+  message: string;
+  read: boolean;
+  createdAt: string;
+}
+
+export interface ManagedProperty {
+  id: string;
+  name: string;
+  address: {
+    line1: string;
+    city: string;
+    state: string;
+    postalCode: string;
+  };
+  unitCount: number;
+  contactEmail?: string;
+  occupiedUnits?: number;
+  activeTicketsCount?: number;
   isActive: boolean;
 }
 

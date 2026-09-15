@@ -15,6 +15,7 @@ export const createTeamMemberSchema = z
     email: z.string().trim().email('Enter a valid email address.'),
     password: teamPasswordSchema,
     role: z.enum(['tenant', 'technician']),
+    propertyId: z.string().regex(/^[a-fA-F0-9]{24}$/, 'Invalid property ID.').optional(),
     unitNumber: z.string().trim().min(1, 'Unit number is required for a tenant.').max(30).optional(),
     specialization: z.string().trim().min(2).max(80).optional(),
   })

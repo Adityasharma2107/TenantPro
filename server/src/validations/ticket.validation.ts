@@ -53,12 +53,21 @@ export const addCommentSchema = z.object({
   message: z.string().trim().min(1, 'Comment cannot be empty.').max(1_000),
 });
 
+export const updateExpenseSchema = z.object({
+  currency: z.string().trim().min(1).max(10).default('$'),
+  partsCost: z.number().min(0).default(0),
+  laborHours: z.number().min(0).default(0),
+  laborRate: z.number().min(0).default(0),
+  totalCost: z.number().min(0),
+  notes: z.string().max(500).optional().default(''),
+});
+
 // Validates optional list filters before they become part of a MongoDB query.
 export const ticketListQuerySchema = z.object({
   status: z.enum(ticketStatuses).optional(),
   priority: z.enum(ticketPriorities).optional(),
   category: z.enum(ticketCategories).optional(),
-  search: z.string().trim().min(1).max(120).optional(),
-  page: z.coerce.number().int().min(1).default(1),
-  limit: z.coerce.number().int().min(1).max(100).default(20),
+  search: z.string().trim().optional(),
+  page: z.coerce.number().int().min(1).optional().default(1),
+  limit: z.coerce.number().int().min(1).max(50).optional().default(10),
 });

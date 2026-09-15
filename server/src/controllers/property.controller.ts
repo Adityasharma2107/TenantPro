@@ -1,8 +1,15 @@
 import type { RequestHandler } from 'express';
+import { Types } from 'mongoose';
+import { AUTH_COOKIE_NAME, authCookieOptions } from '../config/auth.js';
 import { Property } from '../models/Property.model.js';
 import { Ticket } from '../models/Ticket.model.js';
 import { User } from '../models/User.model.js';
-import { updatePropertySchema } from '../validations/property.validation.js';
+import { createAccessToken } from '../utils/auth-token.js';
+import {
+  createPropertySchema,
+  switchPropertySchema,
+  updatePropertySchema,
+} from '../validations/property.validation.js';
 
 // Returns details and operational metrics for the current user's property.
 export const getProperty: RequestHandler = async (request, response) => {
@@ -104,6 +111,120 @@ export const updateProperty: RequestHandler = async (request, response) => {
       manager: property.manager,
       createdAt: (property as any).createdAt,
       updatedAt: (property as any).updatedAt,
+    },
+  });
+};
+
+// Lists all properties managed by or accessible to the current manager
+export const listProperties: RequestHandler = async (request, response) => {
+  const userId = request.user!.userId;
+  const activePropertyId = request.user!.propertyId;
+
+  const properties = await Property.find({
+    $or: [{ manager: userId }, { _id: activePropertyId }],
+  }).sort({ createdAt: -1 });
+
+  const propertiesWithStats = await Promise.all(
+    properties.map(async (prop) => {
+      const [occupiedUnits, activeTicketsCount] = await Promise.all([
+        User.countDocuments({ property: prop._id, role: 'tenant', isActive: true }),
+        Ticket.countDocuments({
+          property: prop._id,
+          status: { $in: ['open', 'assigned', 'in_progress'] },
+        }),
+      ]);
+
+      return {
+        id: prop._id.toString(),
+        name: prop.name,
+        address: prop.address,
+        unitCount: prop.unitCount,
+        contactEmail: prop.contactEmail,
+        occupiedUnits,
+        activeTicketsCount,
+        isActive: prop._id.toString() === activePropertyId,
+      };
+    }),
+  );
+
+  return response.status(200).json({
+    properties: propertiesWithStats,
+  });
+};
+
+// Allows a manager to create a new property
+export const createProperty: RequestHandler = async (request, response) => {
+  const result = createPropertySchema.safeParse(request.body);
+  if (!result.success) {
+    return response.status(400).json({
+      message: 'Please correct the property details.',
+      errors: result.error.issues.map((issue) => ({
+        field: issue.path.join('.'),
+        message: issue.message,
+      })),
+    });
+  }
+
+  const { name, address, unitCount, contactEmail } = result.data;
+  const property = await Property.create({
+    name,
+    address,
+    unitCount,
+    contactEmail,
+    manager: request.user!.userId,
+  });
+
+  return response.status(201).json({
+    message: 'Property created successfully.',
+    property: {
+      id: property._id.toString(),
+      name: property.name,
+      address: property.address,
+      unitCount: property.unitCount,
+      contactEmail: property.contactEmail,
+    },
+  });
+};
+
+// Allows a manager to switch active property in session
+export const switchProperty: RequestHandler = async (request, response) => {
+  const result = switchPropertySchema.safeParse(request.body);
+  if (!result.success) {
+    return response.status(400).json({ message: 'Invalid property selected.' });
+  }
+
+  const { propertyId } = result.data;
+  const userId = request.user!.userId;
+
+  const property = await Property.findOne({
+    _id: propertyId,
+    $or: [{ manager: userId }, { _id: request.user!.propertyId }],
+  });
+
+  if (!property) {
+    return response.status(404).json({ message: 'Property not found or access denied.' });
+  }
+
+  // Update user's active property reference
+  await User.findByIdAndUpdate(userId, { property: property._id });
+
+  // Issue updated JWT cookie with new propertyId
+  const token = createAccessToken({
+    _id: new Types.ObjectId(userId),
+    role: request.user!.role,
+    property: property._id,
+  });
+
+  response.cookie(AUTH_COOKIE_NAME, token, authCookieOptions);
+
+  return response.status(200).json({
+    message: `Switched active property to ${property.name}.`,
+    property: {
+      id: property._id.toString(),
+      name: property.name,
+      address: property.address,
+      unitCount: property.unitCount,
+      contactEmail: property.contactEmail,
     },
   });
 };

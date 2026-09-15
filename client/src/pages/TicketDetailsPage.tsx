@@ -5,9 +5,12 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
+  Coins,
+  Edit3,
   Image as ImageIcon,
   MapPin,
   MessageSquare,
+  Save,
   Send,
   User,
   Wrench,
@@ -27,6 +30,33 @@ import type {
   TicketPriority,
   TicketStatus,
 } from '../types/ticket';
+
+const currencyOptions = [
+  { symbol: '$', code: 'USD', label: '$ - USD / CAD / AUD' },
+  { symbol: '€', code: 'EUR', label: '€ - Euro (EUR)' },
+  { symbol: '£', code: 'GBP', label: '£ - British Pound (GBP)' },
+  { symbol: '₹', code: 'INR', label: '₹ - Indian Rupee (INR)' },
+  { symbol: '¥', code: 'JPY/CNY', label: '¥ - Yen / Yuan (JPY / CNY)' },
+  { symbol: '₩', code: 'KRW', label: '₩ - South Korean Won (KRW)' },
+  { symbol: 'CHF', code: 'CHF', label: 'CHF - Swiss Franc (CHF)' },
+  { symbol: 'C$', code: 'CAD', label: 'C$ - Canadian Dollar (C$)' },
+  { symbol: 'A$', code: 'AUD', label: 'A$ - Australian Dollar (A$)' },
+  { symbol: 'R$', code: 'BRL', label: 'R$ - Brazilian Real (R$)' },
+  { symbol: 'AED', code: 'AED', label: 'AED - UAE Dirham (AED)' },
+  { symbol: '﷼', code: 'SAR', label: '﷼ - Saudi Riyal (SAR)' },
+  { symbol: 'kr', code: 'SEK/NOK', label: 'kr - Nordic Krona (kr)' },
+  { symbol: '₱', code: 'PHP', label: '₱ - Philippine Peso (₱)' },
+  { symbol: '₫', code: 'VND', label: '₫ - Vietnamese Dong (₫)' },
+  { symbol: '₦', code: 'NGN', label: '₦ - Nigerian Naira (₦)' },
+  { symbol: 'R', code: 'ZAR', label: 'R - South African Rand (R)' },
+  { symbol: 'zł', code: 'PLN', label: 'zł - Polish Zloty (zł)' },
+  { symbol: '฿', code: 'THB', label: '฿ - Thai Baht (฿)' },
+  { symbol: 'KSh', code: 'KES', label: 'KSh - Kenyan Shilling (KSh)' },
+  { symbol: '₨', code: 'PKR', label: '₨ - Pakistani Rupee (₨)' },
+  { symbol: 'S$', code: 'SGD', label: 'S$ - Singapore Dollar (S$)' },
+  { symbol: 'NZ$', code: 'NZD', label: 'NZ$ - New Zealand Dollar (NZ$)' },
+  { symbol: 'HK$', code: 'HKD', label: 'HK$ - Hong Kong Dollar (HK$)' },
+];
 
 export function TicketDetailsPage() {
   const { ticketId } = useParams<{ ticketId: string }>();
@@ -101,6 +131,86 @@ export function TicketDetailsPage() {
       setActionError(err instanceof Error ? err.message : 'Could not update priority.');
     },
   });
+
+  // 6. Expense Editing State & Mutation
+  const [isEditingExpense, setIsEditingExpense] = useState(false);
+  const [currency, setCurrency] = useState('$');
+  const [partsCost, setPartsCost] = useState<number | string>(0);
+  const [laborHours, setLaborHours] = useState<number | string>(0);
+  const [laborRate, setLaborRate] = useState<number | string>(0);
+  const [totalCost, setTotalCost] = useState<number | string>(0);
+  const [expenseNotes, setExpenseNotes] = useState('');
+
+  const startEditingExpense = () => {
+    const exp = data?.ticket?.expense;
+    setCurrency(exp?.currency || '$');
+    setPartsCost(exp?.partsCost ?? 0);
+    setLaborHours(exp?.laborHours ?? 0);
+    setLaborRate(exp?.laborRate ?? 0);
+    setTotalCost(exp?.totalCost ?? 0);
+    setExpenseNotes(exp?.notes || '');
+    setIsEditingExpense(true);
+  };
+
+  const handlePartsChange = (val: string) => {
+    setPartsCost(val);
+    const p = parseFloat(val) || 0;
+    const h = parseFloat(String(laborHours)) || 0;
+    const r = parseFloat(String(laborRate)) || 0;
+    setTotalCost(Number((p + h * r).toFixed(2)));
+  };
+
+  const handleLaborHoursChange = (val: string) => {
+    setLaborHours(val);
+    const p = parseFloat(String(partsCost)) || 0;
+    const h = parseFloat(val) || 0;
+    const r = parseFloat(String(laborRate)) || 0;
+    setTotalCost(Number((p + h * r).toFixed(2)));
+  };
+
+  const handleLaborRateChange = (val: string) => {
+    setLaborRate(val);
+    const p = parseFloat(String(partsCost)) || 0;
+    const h = parseFloat(String(laborHours)) || 0;
+    const r = parseFloat(val) || 0;
+    setTotalCost(Number((p + h * r).toFixed(2)));
+  };
+
+  const updateExpenseMutation = useMutation({
+    mutationFn: (body: {
+      currency: string;
+      partsCost: number;
+      laborHours: number;
+      laborRate: number;
+      totalCost: number;
+      notes?: string;
+    }) =>
+      apiRequest(`/api/tickets/${ticketId}/expense`, {
+        method: 'PATCH',
+        body: JSON.stringify(body),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ticket', ticketId] });
+      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      setIsEditingExpense(false);
+      setActionError('');
+    },
+    onError: (err) => {
+      setActionError(err instanceof Error ? err.message : 'Could not update expense.');
+    },
+  });
+
+  const handleExpenseSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    updateExpenseMutation.mutate({
+      currency,
+      partsCost: Number(partsCost) || 0,
+      laborHours: Number(laborHours) || 0,
+      laborRate: Number(laborRate) || 0,
+      totalCost: Number(totalCost) || 0,
+      notes: expenseNotes,
+    });
+  };
 
   const handleCommentSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -444,23 +554,170 @@ export function TicketDetailsPage() {
             {/* Maintenance Cost & Expense Tracking */}
             <div className="mt-5 border-t border-slate-100 pt-4">
               <div className="flex items-center justify-between">
-                <p className="text-xs font-medium text-slate-500">Repair Cost & Parts</p>
-                <span className="text-[10px] font-bold text-slate-400 uppercase">Expense Log</span>
+                <div className="flex items-center gap-1.5">
+                  <Coins size={14} className="text-[#635985]" />
+                  <p className="text-xs font-bold text-slate-700">Repair Cost & Parts</p>
+                </div>
+                {(user?.role === 'manager' || user?.role === 'technician') && !isEditingExpense && (
+                  <button
+                    onClick={startEditingExpense}
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#635985] hover:text-[#393053] hover:underline"
+                  >
+                    <Edit3 size={12} /> {ticket.expense?.totalCost ? 'Edit' : 'Record Cost'}
+                  </button>
+                )}
               </div>
-              <div className="mt-2.5 rounded-xl border border-slate-100 bg-slate-50 p-3 text-xs space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Parts Allocation:</span>
-                  <span className="font-semibold text-slate-800">$35.00</span>
+
+              {isEditingExpense ? (
+                <form onSubmit={handleExpenseSubmit} className="mt-3 space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-3.5 text-xs">
+                  {/* Currency Selection Dropdown */}
+                  <div>
+                    <label className="block font-semibold text-slate-700 mb-1">Currency</label>
+                    <select
+                      value={currency}
+                      onChange={(e) => setCurrency(e.target.value)}
+                      className="w-full rounded-lg border border-slate-200 bg-white p-2 text-xs font-semibold text-slate-800 outline-none focus:border-[#635985]"
+                    >
+                      {currencyOptions.map((c) => (
+                        <option key={c.code} value={c.symbol}>
+                          {c.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block font-semibold text-slate-700 mb-1">
+                        Parts ({currency})
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={partsCost}
+                        onChange={(e) => handlePartsChange(e.target.value)}
+                        className="w-full rounded-lg border border-slate-200 bg-white p-2 text-xs text-slate-800 outline-none focus:border-[#635985]"
+                        placeholder="0.00"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-semibold text-slate-700 mb-1">
+                        Labor (Hrs)
+                      </label>
+                      <input
+                        type="number"
+                        step="0.25"
+                        min="0"
+                        value={laborHours}
+                        onChange={(e) => handleLaborHoursChange(e.target.value)}
+                        className="w-full rounded-lg border border-slate-200 bg-white p-2 text-xs text-slate-800 outline-none focus:border-[#635985]"
+                        placeholder="0.0"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block font-semibold text-slate-700 mb-1">
+                        Labor Rate ({currency}/hr)
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={laborRate}
+                        onChange={(e) => handleLaborRateChange(e.target.value)}
+                        className="w-full rounded-lg border border-slate-200 bg-white p-2 text-xs text-slate-800 outline-none focus:border-[#635985]"
+                        placeholder="0.00"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-900 mb-1">
+                        Total Recorded ({currency})
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={totalCost}
+                        onChange={(e) => setTotalCost(e.target.value)}
+                        className="w-full rounded-lg border border-emerald-300 bg-white p-2 text-xs font-bold text-emerald-700 outline-none focus:border-emerald-600"
+                        placeholder="0.00"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-slate-700 mb-1">
+                      Notes / Replacement Items
+                    </label>
+                    <input
+                      type="text"
+                      value={expenseNotes}
+                      onChange={(e) => setExpenseNotes(e.target.value)}
+                      placeholder="e.g. Replaced shut-off valve and washer"
+                      className="w-full rounded-lg border border-slate-200 bg-white p-2 text-xs text-slate-800 outline-none focus:border-[#635985]"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingExpense(false)}
+                      className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={updateExpenseMutation.isPending}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-[#635985] px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-[#393053] disabled:opacity-50"
+                    >
+                      <Save size={13} /> {updateExpenseMutation.isPending ? 'Saving…' : 'Save Expense'}
+                    </button>
+                  </div>
+                </form>
+              ) : ticket.expense && (ticket.expense.totalCost > 0 || ticket.expense.partsCost > 0 || ticket.expense.laborHours > 0) ? (
+                <div className="mt-2.5 rounded-xl border border-slate-100 bg-slate-50 p-3 text-xs space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Parts Allocation:</span>
+                    <span className="font-semibold text-slate-800">
+                      {ticket.expense.currency || '$'}{(ticket.expense.partsCost || 0).toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Labor Time:</span>
+                    <span className="font-semibold text-slate-800">
+                      {ticket.expense.laborHours || 0} Hours
+                      {ticket.expense.laborRate ? ` (@ ${ticket.expense.currency || '$'}${ticket.expense.laborRate}/hr)` : ''}
+                    </span>
+                  </div>
+                  {ticket.expense.notes && (
+                    <div className="pt-1 text-[11px] text-slate-500 italic">
+                      "{ticket.expense.notes}"
+                    </div>
+                  )}
+                  <div className="flex justify-between border-t border-slate-200/60 pt-1.5 font-bold text-[#18122B]">
+                    <span>Total Recorded:</span>
+                    <span className="text-emerald-700">
+                      {ticket.expense.currency || '$'}{(ticket.expense.totalCost || 0).toFixed(2)}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Labor Time:</span>
-                  <span className="font-semibold text-slate-800">1.25 Hours</span>
+              ) : (
+                <div className="mt-2.5 rounded-xl border border-dashed border-slate-200 p-4 text-center text-xs text-slate-400">
+                  No repair costs recorded for this ticket yet.
+                  {(user?.role === 'manager' || user?.role === 'technician') && (
+                    <button
+                      onClick={startEditingExpense}
+                      className="mt-1.5 block mx-auto text-xs font-bold text-[#635985] hover:underline"
+                    >
+                      + Record Parts & Labor Cost
+                    </button>
+                  )}
                 </div>
-                <div className="flex justify-between border-t border-slate-200/60 pt-1.5 font-bold text-[#18122B]">
-                  <span>Total Recorded:</span>
-                  <span className="text-emerald-700">$95.00</span>
-                </div>
-              </div>
+              )}
             </div>
           </article>
 

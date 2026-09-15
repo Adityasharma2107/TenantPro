@@ -244,4 +244,41 @@ describe('Ticket Lifecycle & Workflow Integration Suite', () => {
       });
     });
   });
+
+  describe('PATCH /api/tickets/:ticketId/expense - Expense & Currency Tracking', () => {
+    it('allows manager to record repair costs with custom currency symbol', async () => {
+      const mockTicketId = new Types.ObjectId();
+      const mockTicket = {
+        _id: mockTicketId,
+        title: 'Broken Boiler',
+        property: propertyId,
+        tenant: tenantId,
+        expense: undefined,
+        save: vi.fn().mockResolvedValue(true),
+      };
+
+      vi.spyOn(Ticket, 'findById').mockResolvedValueOnce(mockTicket as any);
+      vi.spyOn(ActivityLog, 'create').mockResolvedValueOnce({} as any);
+
+      const response = await request(app)
+        .patch(`/api/tickets/${mockTicketId}/expense`)
+        .set('Cookie', [`${AUTH_COOKIE_NAME}=${managerToken}`])
+        .send({
+          currency: '€',
+          partsCost: 45.5,
+          laborHours: 2,
+          laborRate: 50,
+          totalCost: 145.5,
+          notes: 'Replaced heating valve',
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.ticket.expense).toMatchObject({
+        currency: '€',
+        partsCost: 45.5,
+        totalCost: 145.5,
+      });
+      expect(mockTicket.save).toHaveBeenCalled();
+    });
+  });
 });

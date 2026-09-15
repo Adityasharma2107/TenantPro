@@ -11,19 +11,22 @@ import {
   Mail,
   MapPin,
   PhoneCall,
+  Plus,
   Shield,
   Trash2,
   Users,
   Wrench,
   X,
 } from 'lucide-react';
+import { AddPropertyModal } from '../components/AddPropertyModal';
 import { MetricCard } from '../components/MetricCard';
 import { apiRequest } from '../lib/api';
-import type { CurrentUser, PropertyData } from '../types/ticket';
+import type { CurrentUser, ManagedProperty, PropertyData } from '../types/ticket';
 
 export function PropertyPage() {
   const queryClient = useQueryClient();
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isAddOpen, setIsAddOpen] = useState(false);
   const [editError, setEditError] = useState('');
   const [editSuccess, setEditSuccess] = useState('');
 
@@ -42,6 +45,28 @@ export function PropertyPage() {
   } = useQuery({
     queryKey: ['property'],
     queryFn: () => apiRequest<PropertyData>('/api/property'),
+  });
+
+  const { data: propertiesData } = useQuery({
+    queryKey: ['properties-list'],
+    queryFn: () => apiRequest<{ properties: ManagedProperty[] }>('/api/property/all'),
+    enabled: isManager,
+  });
+
+  const switchPropertyMutation = useMutation({
+    mutationFn: (propertyId: string) =>
+      apiRequest('/api/property/switch', {
+        method: 'POST',
+        body: JSON.stringify({ propertyId }),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['current-user'] });
+      queryClient.invalidateQueries({ queryKey: ['property'] });
+      queryClient.invalidateQueries({ queryKey: ['properties-list'] });
+      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      queryClient.invalidateQueries({ queryKey: ['team'] });
+      queryClient.invalidateQueries({ queryKey: ['analytics'] });
+    },
   });
 
   const property = propertyData?.property;
@@ -136,6 +161,41 @@ export function PropertyPage() {
 
   return (
     <div className="space-y-8">
+      {/* Multi-Property Switcher for Managers */}
+      {isManager && (propertiesData?.properties?.length ?? 0) > 1 && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-[#1E1735]">
+          <div className="flex items-center gap-2.5">
+            <div className="grid size-8 place-items-center rounded-lg bg-[#635985]/10 text-[#635985] dark:bg-white/10 dark:text-[#92EEFF]">
+              <Building2 size={18} />
+            </div>
+            <div>
+              <span className="block text-xs font-bold text-[#18122B] dark:text-white">
+                Your Properties ({propertiesData?.properties.length})
+              </span>
+              <span className="block text-[10px] text-slate-500 dark:text-slate-400">
+                Click any building to switch operational context
+              </span>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {propertiesData?.properties.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => switchPropertyMutation.mutate(p.id)}
+                disabled={p.isActive || switchPropertyMutation.isPending}
+                className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all ${
+                  p.isActive
+                    ? 'bg-[#635985] text-white shadow-sm'
+                    : 'border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 dark:border-white/10 dark:bg-white/5 dark:text-slate-300'
+                }`}
+              >
+                {p.name} {p.isActive ? '✓ (Active)' : ''}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Property Hero Header */}
       <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-gradient-to-br from-[#18122B] via-[#393053] to-[#443C68] p-6 text-white shadow-xl lg:p-10">
         <div className="relative z-10 flex flex-col justify-between gap-6 md:flex-row md:items-center">
@@ -176,12 +236,20 @@ export function PropertyPage() {
             )}
 
             {isManager && (
-              <button
-                onClick={openEditModal}
-                className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-[#18122B] shadow-md transition-all hover:bg-slate-100"
-              >
-                <Edit3 size={16} /> Edit Property
-              </button>
+              <>
+                <button
+                  onClick={() => setIsAddOpen(true)}
+                  className="inline-flex items-center gap-2 rounded-xl bg-[#92EEFF] px-4 py-2.5 text-sm font-bold text-[#18122B] shadow-md transition-all hover:bg-white"
+                >
+                  <Plus size={16} /> Add Property
+                </button>
+                <button
+                  onClick={openEditModal}
+                  className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-[#18122B] shadow-md transition-all hover:bg-slate-100"
+                >
+                  <Edit3 size={16} /> Edit Property
+                </button>
+              </>
             )}
           </div>
         </div>
@@ -523,6 +591,9 @@ export function PropertyPage() {
           </div>
         </div>
       )}
+
+      {/* Add Property Modal */}
+      <AddPropertyModal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} />
     </div>
   );
 }

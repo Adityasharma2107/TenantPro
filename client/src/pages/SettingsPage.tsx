@@ -600,13 +600,6 @@ export function SettingsPage() {
                 <span className="font-bold capitalize text-[#18122B]">{user?.role}</span>
               </div>
               <div className="flex items-center justify-between rounded-xl bg-slate-50 p-3">
-                <span className="font-medium text-slate-500">Theme Appearance</span>
-                <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5 text-xs font-semibold">
-                  <span className="rounded-md bg-[#635985] px-2 py-0.5 text-white shadow-sm">Light</span>
-                  <span className="px-2 py-0.5 text-slate-400">Dark (Auto)</span>
-                </div>
-              </div>
-              <div className="flex items-center justify-between rounded-xl bg-slate-50 p-3">
                 <span className="font-medium text-slate-500">Account ID</span>
                 <span className="font-mono text-slate-700">{user?.id}</span>
               </div>

@@ -1,9 +1,9 @@
-import type { QueryFilter } from 'mongoose';
-import { Types } from 'mongoose';
+import mongoose, { Types, type QueryFilter } from 'mongoose';
 import type { RequestHandler } from 'express';
 
 import { ActivityLog } from '../models/ActivityLog.model.js';
 import { Comment } from '../models/Comment.model.js';
+import { Property } from '../models/Property.model.js';
 import { Ticket, type ITicket, type TicketStatus } from '../models/Ticket.model.js';
 import { User } from '../models/User.model.js';
 import {
@@ -11,6 +11,7 @@ import {
   assignTechnicianSchema,
   createTicketSchema,
   ticketListQuerySchema,
+  updateExpenseSchema,
   updatePrioritySchema,
   updateStatusSchema,
 } from '../validations/ticket.validation.js';
@@ -19,6 +20,7 @@ import {
   emitTicketCreated,
   emitTicketUpdated,
 } from '../socket.js';
+import { sendNotification } from './notification.controller.js';
 
 const technicianStatuses: TicketStatus[] = ['in_progress', 'resolved'];
 
@@ -89,6 +91,21 @@ export const createTicket: RequestHandler = async (request, response) => {
   await addActivity(ticket._id, request.user!.userId, 'ticket_created', 'Tenant reported this maintenance issue.');
 
   emitTicketCreated(request.user!.propertyId, ticket);
+
+  // Notify property manager of newly created ticket if database is connected
+  if (mongoose.connection.readyState === 1) {
+    const propertyDoc = await Property.findById(request.user!.propertyId);
+    if (propertyDoc?.manager) {
+      await sendNotification({
+        recipient: propertyDoc.manager,
+        actor: request.user!.userId,
+        ticket: ticket._id,
+        type: 'ticket_created',
+        title: 'New Maintenance Ticket',
+        message: `${ticket.title} reported at ${ticket.location}`,
+      });
+    }
+  }
 
   return response.status(201).json({ message: 'Ticket created successfully.', ticket });
 };
@@ -194,6 +211,26 @@ export const assignTechnician: RequestHandler = async (request, response) => {
 
   emitTicketUpdated(ticket.property.toString(), ticket);
 
+  // Notify assigned technician
+  await sendNotification({
+    recipient: technician._id,
+    actor: request.user!.userId,
+    ticket: ticket._id,
+    type: 'ticket_assigned',
+    title: 'Work Order Assigned to You',
+    message: `You were assigned to "${ticket.title}" (${ticket.location})`,
+  });
+
+  // Notify resident
+  await sendNotification({
+    recipient: ticket.tenant,
+    actor: request.user!.userId,
+    ticket: ticket._id,
+    type: 'ticket_assigned',
+    title: 'Technician Assigned',
+    message: `${technician.name} was assigned to handle "${ticket.title}"`,
+  });
+
   return response.status(200).json({ message: 'Technician assigned successfully.', ticket });
 };
 
@@ -251,6 +288,33 @@ export const updateStatus: RequestHandler = async (request, response) => {
 
   emitTicketUpdated(ticket.property.toString(), ticket);
 
+  // Notify resident if status updated by someone else
+  if (ticket.tenant.toString() !== request.user!.userId) {
+    await sendNotification({
+      recipient: ticket.tenant,
+      actor: request.user!.userId,
+      ticket: ticket._id,
+      type: 'status_changed',
+      title: 'Ticket Status Updated',
+      message: `"${ticket.title}" is now ${result.data.status.replace('_', ' ')}`,
+    });
+  }
+
+  // If updated by technician, notify property manager
+  if (mongoose.connection.readyState === 1) {
+    const propertyDoc = await Property.findById(ticket.property);
+    if (propertyDoc?.manager && propertyDoc.manager.toString() !== request.user!.userId) {
+      await sendNotification({
+        recipient: propertyDoc.manager,
+        actor: request.user!.userId,
+        ticket: ticket._id,
+        type: 'status_changed',
+        title: 'Ticket Status Updated',
+        message: `"${ticket.title}" is now ${result.data.status.replace('_', ' ')}`,
+      });
+    }
+  }
+
   return response.status(200).json({ message: 'Ticket status updated successfully.', ticket });
 };
 
@@ -275,5 +339,78 @@ export const addComment: RequestHandler = async (request, response) => {
   const populatedComment = await comment.populate('author', 'name role');
   emitCommentAdded(ticket.property.toString(), ticket._id.toString(), populatedComment);
 
+  // Notify other participants if database is connected
+  if (mongoose.connection.readyState === 1) {
+    const propertyDoc = await Property.findById(ticket.property);
+    const recipients = new Set<string>();
+    if (ticket.tenant.toString() !== request.user!.userId) {
+      recipients.add(ticket.tenant.toString());
+    }
+    if (ticket.assignedTechnician && ticket.assignedTechnician.toString() !== request.user!.userId) {
+      recipients.add(ticket.assignedTechnician.toString());
+    }
+    if (propertyDoc?.manager && propertyDoc.manager.toString() !== request.user!.userId) {
+      recipients.add(propertyDoc.manager.toString());
+    }
+
+    for (const recipientId of recipients) {
+      await sendNotification({
+        recipient: recipientId,
+        actor: request.user!.userId,
+        ticket: ticket._id,
+        type: 'comment_added',
+        title: 'New Message on Ticket',
+        message: `New message on "${ticket.title}"`,
+      });
+    }
+  }
+
   return response.status(201).json({ message: 'Comment added successfully.', comment: populatedComment });
+};
+
+// Updates editable repair cost, labor hours, rate, and global currency on a ticket
+export const updateTicketExpense: RequestHandler = async (request, response) => {
+  const result = updateExpenseSchema.safeParse(request.body);
+  if (!result.success) {
+    return response.status(400).json({
+      message: 'Please provide valid expense details.',
+      errors: result.error.issues.map((i) => ({ field: i.path.join('.'), message: i.message })),
+    });
+  }
+
+  const ticket = await findTicket(request.params.ticketId, response);
+  if (!ticket) return;
+
+  if (!canAccessTicket(ticket, request.user!)) {
+    return response.status(403).json({ message: 'You do not have access to this ticket.' });
+  }
+
+  if (request.user!.role === 'tenant') {
+    return response.status(403).json({ message: 'Tenants cannot edit ticket expenses.' });
+  }
+
+  ticket.expense = {
+    currency: result.data.currency,
+    partsCost: result.data.partsCost,
+    laborHours: result.data.laborHours,
+    laborRate: result.data.laborRate,
+    totalCost: result.data.totalCost,
+    notes: result.data.notes,
+  };
+
+  await ticket.save();
+
+  await addActivity(
+    ticket._id,
+    request.user!.userId,
+    'ticket_updated',
+    `Updated repair cost to ${result.data.currency}${result.data.totalCost.toFixed(2)} (Parts: ${result.data.currency}${result.data.partsCost.toFixed(2)}, Labor: ${result.data.laborHours} hrs).`,
+  );
+
+  emitTicketUpdated(ticket.property.toString(), ticket);
+
+  return response.status(200).json({
+    message: 'Ticket expense updated successfully.',
+    ticket,
+  });
 };
