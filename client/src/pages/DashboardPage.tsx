@@ -239,7 +239,7 @@ export function DashboardPage() {
 
           <div className="overflow-x-auto">
             <table className="min-w-[700px] w-full text-left text-sm">
-              <thead className="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <thead className="border-b border-slate-100 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:border-white/10 dark:bg-[#18122B]/60 dark:text-slate-300">
                 <tr>
                   <th className="px-6 py-3">Ticket</th>
                   <th className="px-4 py-3">Location</th>
@@ -248,28 +248,28 @@ export function DashboardPage() {
                   <th className="px-6 py-3 text-right">Updated</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                 {tickets.length ? (
                   tickets.slice(0, 5).map((ticket) => (
                     <tr
                       key={ticket._id}
                       onClick={() => navigate(`/app/tickets/${ticket._id}`)}
-                      className="cursor-pointer hover:bg-slate-50 transition-colors"
+                      className="cursor-pointer hover:bg-slate-50/80 dark:hover:bg-white/[0.03] transition-colors"
                     >
                       <td className="px-6 py-4">
-                        <p className="font-semibold text-[#393053]">
+                        <p className="font-bold text-[#635985] dark:text-[#92EEFF]">
                           #{ticket._id.slice(-5).toUpperCase()}
                         </p>
-                        <p className="mt-1 font-medium text-slate-700">{ticket.title}</p>
+                        <p className="mt-1 font-medium text-slate-700 dark:text-white line-clamp-1">{ticket.title}</p>
                       </td>
-                      <td className="px-4 py-4 text-slate-600">{ticket.location}</td>
+                      <td className="px-4 py-4 text-slate-600 dark:text-slate-300 font-medium">{ticket.location}</td>
                       <td className="px-4 py-4">
                         <PriorityBadge priority={ticket.priority} />
                       </td>
                       <td className="px-4 py-4">
                         <StatusBadge status={ticket.status} />
                       </td>
-                      <td className="px-6 py-4 text-right text-slate-500">
+                      <td className="px-6 py-4 text-right text-xs text-slate-500 dark:text-slate-400">
                         {timeAgo(ticket.updatedAt)}
                       </td>
                     </tr>
@@ -421,29 +421,29 @@ export function DashboardPage() {
                 analytics.technicianLeaderboard.map((tech) => (
                   <div
                     key={tech.id}
-                    className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/60 p-3.5"
+                    className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/60 p-3.5 dark:border-white/10 dark:bg-white/5"
                   >
                     <div>
-                      <p className="text-sm font-bold text-[#18122B]">{tech.name}</p>
-                      <p className="text-xs text-slate-400">
+                      <p className="text-sm font-bold text-[#18122B] dark:text-white">{tech.name}</p>
+                      <p className="text-xs font-semibold text-slate-500 dark:text-[#92EEFF]">
                         {tech.specialization || 'General Maintenance'}
                       </p>
                     </div>
 
                     <div className="flex items-center gap-4 text-xs">
                       <div className="text-right">
-                        <span className="block font-bold text-amber-700">{tech.activeCount} active</span>
-                        <span className="text-[11px] text-slate-400">assigned</span>
+                        <span className="block font-bold text-amber-700 dark:text-amber-300">{tech.activeCount} active</span>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400">assigned</span>
                       </div>
                       <div className="text-right">
-                        <span className="block font-bold text-emerald-700">{tech.resolvedCount} done</span>
-                        <span className="text-[11px] text-slate-400">resolved</span>
+                        <span className="block font-bold text-emerald-700 dark:text-emerald-300">{tech.resolvedCount} done</span>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400">resolved</span>
                       </div>
                     </div>
                   </div>
                 ))
               ) : (
-                <p className="py-8 text-center text-xs text-slate-400">
+                <p className="py-8 text-center text-xs text-slate-400 dark:text-slate-400">
                   No active technicians found. Onboard technicians to track dispatch velocity.
                 </p>
               )}

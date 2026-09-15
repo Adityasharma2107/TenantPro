@@ -206,17 +206,17 @@ export function AddTeamMemberModal({
             <div className="space-y-4">
               {/* Property Selection Dropdown */}
               <div>
-                <label htmlFor="member-property" className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+                <label htmlFor="member-property" className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                   Assigned Property / Building
                 </label>
                 <div className="relative mt-1.5">
-                  <Building2 size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+                  <Building2 size={18} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-[#92EEFF] z-10" />
                   <select
                     id="member-property"
                     name="propertyId"
                     value={selectedPropertyId}
                     onChange={(e) => setSelectedPropertyId(e.target.value)}
-                    className="auth-input pl-10"
+                    className="auth-input !pl-11"
                   >
                     <option value="">Current Active Property</option>
                     {propertiesData?.properties?.map((prop) => (
@@ -226,7 +226,7 @@ export function AddTeamMemberModal({
                     ))}
                   </select>
                 </div>
-                <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                   Select which property or building this resident will belong to.
                 </p>
               </div>

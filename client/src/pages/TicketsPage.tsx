@@ -137,7 +137,8 @@ export function TicketsPage() {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-4">
+      {/* Filters & Search Bar */}
+      <div className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10 dark:bg-[#1E1735]">
         {/* Search */}
         <div className="relative">
           <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -145,7 +146,7 @@ export function TicketsPage() {
             value={search}
             onChange={(e) => updateParam('search', e.target.value)}
             placeholder="Search tickets..."
-            className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm outline-none focus:border-[#635985] focus:bg-white focus:ring-2 focus:ring-[#635985]/15"
+            className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm outline-none focus:border-[#635985] focus:bg-white focus:ring-2 focus:ring-[#635985]/15 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder-slate-500"
           />
         </div>
 
@@ -154,7 +155,7 @@ export function TicketsPage() {
           <select
             value={status}
             onChange={(e) => updateParam('status', e.target.value)}
-            className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 px-3 text-sm outline-none focus:border-[#635985] focus:bg-white focus:ring-2 focus:ring-[#635985]/15"
+            className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 px-3 text-sm outline-none focus:border-[#635985] focus:bg-white focus:ring-2 focus:ring-[#635985]/15 dark:border-white/10 dark:bg-white/5 dark:text-white"
           >
             <option value="">All Statuses</option>
             <option value="open">Open</option>
@@ -170,7 +171,7 @@ export function TicketsPage() {
           <select
             value={priority}
             onChange={(e) => updateParam('priority', e.target.value)}
-            className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 px-3 text-sm outline-none focus:border-[#635985] focus:bg-white focus:ring-2 focus:ring-[#635985]/15"
+            className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 px-3 text-sm outline-none focus:border-[#635985] focus:bg-white focus:ring-2 focus:ring-[#635985]/15 dark:border-white/10 dark:bg-white/5 dark:text-white"
           >
             <option value="">All Priorities</option>
             <option value="urgent">Urgent</option>
@@ -186,7 +187,7 @@ export function TicketsPage() {
           <select
             value={category}
             onChange={(e) => updateParam('category', e.target.value)}
-            className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 px-3 text-sm outline-none focus:border-[#635985] focus:bg-white focus:ring-2 focus:ring-[#635985]/15"
+            className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 px-3 text-sm outline-none focus:border-[#635985] focus:bg-white focus:ring-2 focus:ring-[#635985]/15 dark:border-white/10 dark:bg-white/5 dark:text-white"
           >
             <option value="">All Categories</option>
             <option value="plumbing">Plumbing</option>
@@ -201,26 +202,26 @@ export function TicketsPage() {
       </div>
 
       {/* Tickets Table */}
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-[#1E1735]">
         {isLoading ? (
-          <div className="grid min-h-[300px] place-items-center text-slate-500">
+          <div className="grid min-h-[300px] place-items-center text-slate-500 dark:text-slate-400">
             Loading tickets...
           </div>
         ) : isError ? (
           <div className="p-8 text-center">
-            <p className="text-sm font-semibold text-rose-600">Failed to load tickets.</p>
+            <p className="text-sm font-semibold text-rose-600 dark:text-rose-400">Failed to load tickets.</p>
             <button
               onClick={() => refetch()}
-              className="mt-2 text-xs font-semibold text-[#635985] underline"
+              className="mt-2 text-xs font-semibold text-[#635985] underline dark:text-[#92EEFF]"
             >
               Try again
             </button>
           </div>
         ) : tickets.length === 0 ? (
           <div className="py-16 text-center">
-            <Filter size={32} className="mx-auto text-slate-300" />
-            <h3 className="mt-3 text-base font-semibold text-[#18122B]">No tickets found</h3>
-            <p className="mt-1 text-sm text-slate-500">
+            <Filter size={32} className="mx-auto text-slate-300 dark:text-slate-600" />
+            <h3 className="mt-3 text-base font-semibold text-[#18122B] dark:text-white">No tickets found</h3>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
               Try adjusting your search or filters, or submit a new maintenance request.
             </p>
             {user?.role === 'tenant' && (
@@ -235,7 +236,7 @@ export function TicketsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-[850px] w-full text-left text-sm">
-              <thead className="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <thead className="border-b border-slate-100 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:border-white/10 dark:bg-[#18122B]/60 dark:text-slate-300">
                 <tr>
                   <th className="px-6 py-3.5">Ticket</th>
                   <th className="px-4 py-3.5">Category</th>
@@ -247,7 +248,7 @@ export function TicketsPage() {
                   <th className="px-6 py-3.5 text-right">Updated</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                 {tickets.map((t) => {
                   const tenantInfo = typeof t.tenant === 'object' ? t.tenant : null;
                   const techInfo = typeof t.assignedTechnician === 'object' ? t.assignedTechnician : null;
@@ -256,25 +257,25 @@ export function TicketsPage() {
                     <tr
                       key={t._id}
                       onClick={() => navigate(`/app/tickets/${t._id}`)}
-                      className="cursor-pointer hover:bg-slate-50/80 transition-colors"
+                      className="cursor-pointer hover:bg-slate-50/80 dark:hover:bg-white/[0.03] transition-colors"
                     >
                       <td className="px-6 py-4">
-                        <span className="text-xs font-semibold text-[#635985]">
+                        <span className="text-xs font-bold text-[#635985] dark:text-[#92EEFF]">
                           #{t._id.slice(-5).toUpperCase()}
                         </span>
-                        <p className="font-semibold text-[#18122B] mt-0.5 line-clamp-1">{t.title}</p>
+                        <p className="font-semibold text-[#18122B] dark:text-white mt-0.5 line-clamp-1">{t.title}</p>
                       </td>
                       <td className="px-4 py-4">
                         <CategoryBadge category={t.category as TicketCategory} />
                       </td>
-                      <td className="px-4 py-4 text-slate-600 font-medium">{t.location}</td>
+                      <td className="px-4 py-4 text-slate-600 dark:text-slate-300 font-medium">{t.location}</td>
                       {user?.role !== 'tenant' && (
-                        <td className="px-4 py-4 text-slate-600">
+                        <td className="px-4 py-4 text-slate-600 dark:text-slate-300">
                           {tenantInfo ? (
                             <div>
-                              <p className="font-medium text-slate-900">{tenantInfo.name}</p>
+                              <p className="font-medium text-slate-900 dark:text-white">{tenantInfo.name}</p>
                               {tenantInfo.unitNumber && (
-                                <p className="text-xs text-slate-400">Unit {tenantInfo.unitNumber}</p>
+                                <p className="text-xs text-slate-400 dark:text-slate-400">Unit {tenantInfo.unitNumber}</p>
                               )}
                             </div>
                           ) : (
@@ -284,12 +285,12 @@ export function TicketsPage() {
                       )}
                       <td className="px-4 py-4">
                         {techInfo ? (
-                          <div className="flex items-center gap-1.5 text-slate-700">
-                            <Wrench size={14} className="text-[#635985]" />
+                          <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-200">
+                            <Wrench size={14} className="text-[#635985] dark:text-[#92EEFF]" />
                             <span className="font-medium">{techInfo.name}</span>
                           </div>
                         ) : (
-                          <span className="text-xs font-medium text-slate-400 italic">Unassigned</span>
+                          <span className="text-xs font-medium text-slate-400 dark:text-slate-400 italic">Unassigned</span>
                         )}
                       </td>
                       <td className="px-4 py-4">
@@ -298,7 +299,7 @@ export function TicketsPage() {
                       <td className="px-4 py-4">
                         <StatusBadge status={t.status as TicketStatus} />
                       </td>
-                      <td className="px-6 py-4 text-right text-xs text-slate-500">
+                      <td className="px-6 py-4 text-right text-xs text-slate-500 dark:text-slate-400">
                         {timeAgo(t.updatedAt)}
                       </td>
                     </tr>

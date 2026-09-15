@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme { --color-tenant-ink: #18122B; --color-tenant-primary: #393053; --color-tenant-active: #635985; --color-tenant-blue: #30AFFF; --color-tenant-mint: #D8FFC5; }
 
 * { box-sizing: border-box; }
@@ -100,7 +102,7 @@ button:hover { transform: translateY(-1px); }
 
 @keyframes tenantpro-login-copy {
   from { opacity: 0; transform: translateX(-14px); }
-  to { opacity: 1; transform: translateX(0); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes tenantpro-login-form {
@@ -170,6 +172,14 @@ html.dark .text-\[\#18122B\] {
   color: #F8FAFC !important;
 }
 
+html.dark .text-\[\#393053\] {
+  color: #92EEFF !important;
+}
+
+html.dark .text-\[\#635985\] {
+  color: #C5B4E3 !important;
+}
+
 html.dark .text-slate-900,
 html.dark .text-slate-800 {
   color: #F1F5F9 !important;
@@ -184,12 +194,21 @@ html.dark .text-slate-600 {
 }
 
 html.dark .text-slate-500 {
-  color: #94A3B8 !important;
+  color: #A0AEC0 !important;
+}
+
+html.dark .text-slate-400 {
+  color: #CBD5E1 !important;
 }
 
 html.dark .bg-slate-50,
 html.dark .bg-\[\#F8FAFC\] {
   background-color: #140E26 !important;
+}
+
+html.dark .bg-slate-100 {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #E2E8F0 !important;
 }
 
 html.dark .border-slate-200,
@@ -200,10 +219,24 @@ html.dark .border-slate-100 {
 
 html.dark input,
 html.dark select,
-html.dark textarea {
+html.dark textarea,
+html.dark .auth-input {
   background-color: #140E26 !important;
   color: #F8FAFC !important;
   border-color: rgba(255, 255, 255, 0.15) !important;
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.4) !important;
+}
+
+html.dark .auth-input::placeholder,
+html.dark input::placeholder {
+  color: #64748B !important;
+}
+
+html.dark .auth-input:focus,
+html.dark input:focus,
+html.dark select:focus {
+  border-color: #92EEFF !important;
+  box-shadow: 0 0 0 3px rgba(146, 238, 255, 0.15) !important;
 }
 
 
