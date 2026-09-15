@@ -116,7 +116,9 @@ export function AssignTechnicianModal({
                 <option value="">-- Select a technician --</option>
                 {technicians.map((tech) => (
                   <option key={tech.id} value={tech.id}>
-                    {tech.name} {tech.specialization ? `(${tech.specialization})` : ''}
+                    {tech.name}
+                    {tech.specialization ? ` (${tech.specialization})` : ''}
+                    {tech.propertyName ? ` • ${tech.propertyName}` : ''}
                   </option>
                 ))}
               </select>

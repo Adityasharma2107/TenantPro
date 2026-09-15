@@ -74,6 +74,10 @@ export function AddTeamMemberModal({
       role,
     };
 
+    if (selectedPropertyId) {
+      payload.propertyId = selectedPropertyId;
+    }
+
     if (role === 'tenant') {
       const unitNumber = String(form.get('unitNumber') ?? '').trim();
       if (!unitNumber) {
@@ -81,9 +85,6 @@ export function AddTeamMemberModal({
         return;
       }
       payload.unitNumber = unitNumber;
-      if (selectedPropertyId) {
-        payload.propertyId = selectedPropertyId;
-      }
     } else {
       const specialization = String(form.get('specialization') ?? '').trim();
       if (specialization) {
@@ -201,56 +202,56 @@ export function AddTeamMemberModal({
             />
           </div>
 
-          {/* Conditional: Property & Unit Number for Tenant */}
-          {role === 'tenant' ? (
-            <div className="space-y-4">
-              {/* Property Selection Dropdown */}
-              <div>
-                <label htmlFor="member-property" className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                  Assigned Property / Building
-                </label>
-                <div className="relative mt-1.5">
-                  <Building2 size={18} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-[#92EEFF] z-10" />
-                  <select
-                    id="member-property"
-                    name="propertyId"
-                    value={selectedPropertyId}
-                    onChange={(e) => setSelectedPropertyId(e.target.value)}
-                    className="auth-input !pl-11"
-                  >
-                    <option value="">Current Active Property</option>
-                    {propertiesData?.properties?.map((prop) => (
-                      <option key={prop.id} value={prop.id}>
-                        {prop.name} ({prop.unitCount} units)
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                  Select which property or building this resident will belong to.
-                </p>
-              </div>
+          {/* Property Selection Dropdown (For both Tenant and Technician) */}
+          <div>
+            <label htmlFor="member-property" className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              {role === 'tenant' ? 'Assigned Property / Building' : 'Assigned Property / Service Location'}
+            </label>
+            <div className="relative mt-1.5">
+              <Building2 size={18} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-[#92EEFF] z-10" />
+              <select
+                id="member-property"
+                name="propertyId"
+                value={selectedPropertyId}
+                onChange={(e) => setSelectedPropertyId(e.target.value)}
+                className="auth-input !pl-11"
+              >
+                <option value="">Current Active Property</option>
+                {propertiesData?.properties?.map((prop) => (
+                  <option key={prop.id} value={prop.id}>
+                    {prop.name} ({prop.unitCount} units)
+                  </option>
+                ))}
+              </select>
+            </div>
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              {role === 'tenant'
+                ? 'Select which property or building this resident will belong to.'
+                : 'Select which property or building this technician will service.'}
+            </p>
+          </div>
 
-              <div>
-                <label htmlFor="member-unit" className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400">
-                  Unit / Apartment Number
-                </label>
-                <input
-                  id="member-unit"
-                  name="unitNumber"
-                  required
-                  maxLength={30}
-                  placeholder="e.g. Unit 302, Tower B"
-                  className="auth-input mt-1.5"
-                />
-                <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
-                  Residents will see this pre-filled on their maintenance complaints.
-                </p>
-              </div>
+          {/* Conditional: Unit Number for Tenant OR Specialization for Technician */}
+          {role === 'tenant' ? (
+            <div>
+              <label htmlFor="member-unit" className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                Unit / Apartment Number
+              </label>
+              <input
+                id="member-unit"
+                name="unitNumber"
+                required
+                maxLength={30}
+                placeholder="e.g. Unit 302, Tower B"
+                className="auth-input mt-1.5"
+              />
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                Residents will see this pre-filled on their maintenance complaints.
+              </p>
             </div>
           ) : (
             <div>
-              <label htmlFor="member-specialization" className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+              <label htmlFor="member-specialization" className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                 Trade Specialization
               </label>
               <select
@@ -265,7 +266,7 @@ export function AddTeamMemberModal({
                   </option>
                 ))}
               </select>
-              <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                 Shown to managers when assigning technicians to maintenance tickets.
               </p>
             </div>
