@@ -35,7 +35,7 @@ export function ThankYouPage() {
             <a href="tel:+15125550199" className="font-bold text-[#635985] hover:underline">
               (512) 555-0199
             </a>{' '}
-            or check our live demo workspace.
+            or sign in to your operations workspace.
           </p>
         </div>
 
@@ -50,7 +50,7 @@ export function ThankYouPage() {
             to="/login"
             className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#635985] px-6 py-3 text-sm font-bold text-white shadow-md shadow-[#635985]/25 hover:bg-[#393053] sm:w-auto"
           >
-            Explore Live Demo <ArrowRight size={16} />
+            Sign In to Portal <ArrowRight size={16} />
           </Link>
         </div>
       </main>

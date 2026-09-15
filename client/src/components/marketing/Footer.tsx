@@ -103,8 +103,8 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link to="/app/dashboard" className="transition hover:text-white">
-                  Live Demo Session
+                <Link to="/login" className="transition hover:text-white">
+                  Client Sign In
                 </Link>
               </li>
             </ul>

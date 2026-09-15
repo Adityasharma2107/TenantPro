@@ -32,8 +32,8 @@ export function Navbar() {
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="inline-flex size-2 rounded-full bg-[#30AFFF]" />
-            <span className="hidden sm:inline">24/7 Multi-Role Property Dispatch:</span>
-            <span className="font-semibold text-[#92EEFF]">Skyline Heights Demo Online</span>
+            <span className="hidden sm:inline">24/7 Property Maintenance Platform:</span>
+            <span className="font-semibold text-[#92EEFF]">Multi-Family & Commercial Systems Active</span>
           </div>
 
           <div className="flex items-center gap-5 text-white/70">

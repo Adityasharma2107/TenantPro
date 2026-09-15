@@ -5,6 +5,7 @@ import {
   Bell,
   Building2,
   Camera,
+  CheckCircle2,
   ChevronDown,
   Clock,
   MessageSquare,
@@ -14,13 +15,12 @@ import {
   Star,
   Wrench,
 } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Footer } from '../components/marketing/Footer';
 import { Navbar } from '../components/marketing/Navbar';
 import { ScrollToTop } from '../components/marketing/ScrollToTop';
 
 export function LandingPage() {
-  const navigate = useNavigate();
   const [activeFaq, setActiveFaq] = useState<number | null>(0);
   const [selectedRoleTab, setSelectedRoleTab] = useState<'manager' | 'tenant' | 'technician'>('manager');
 
@@ -46,9 +46,9 @@ export function LandingPage() {
         'TenantPro enforces strict role-based access control (RBAC) and database-level multi-tenant isolation. All requests are securely verified via encrypted HTTP-only JWT cookies, and passwords are protected with 12-round bcrypt hashing.',
     },
     {
-      question: 'Can I test TenantPro before onboarding an entire residential building?',
+      question: 'Can I try TenantPro for my property without commitment?',
       answer:
-        'Absolutely. Our live interactive environment includes pre-seeded demonstration data for "Skyline Heights". You can explore the Manager, Resident, and Technician perspectives with 1-click test credentials right now without entering a credit card.',
+        'Yes! You can register your property in under 2 minutes for free. You will immediately get full access to the manager dashboard, resident portal, and technician work queues to experience real-time maintenance operations firsthand.',
     },
   ];
 
@@ -91,31 +91,6 @@ export function LandingPage() {
     },
   ];
 
-  const demoAccounts = [
-    {
-      role: 'Manager',
-      email: 'manager@tenantpro.com',
-      note: 'Full building control & dispatch',
-      color: 'bg-[#635985]',
-    },
-    {
-      role: 'Resident (Unit 4B)',
-      email: 'tenant1@tenantpro.com',
-      note: 'Photo reporting & live timeline',
-      color: 'bg-[#30AFFF]',
-    },
-    {
-      role: 'Plumber Technician',
-      email: 'tech.plumbing@tenantpro.com',
-      note: 'Mobile work queue & parts tracker',
-      color: 'bg-emerald-600',
-    },
-  ];
-
-  const handleQuickDemo = (email: string) => {
-    navigate(`/login?email=${encodeURIComponent(email)}`);
-  };
-
   return (
     <div className="marketing-page min-h-screen bg-white text-[#18122B] selection:bg-[#635985] selection:text-white">
       <Navbar />
@@ -144,44 +119,30 @@ export function LandingPage() {
             {/* Main Action Buttons */}
             <div className="mt-8 flex flex-col items-center justify-center gap-3.5 sm:flex-row">
               <Link
-                to="/login"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#635985] px-7 py-3.5 text-base font-bold text-white shadow-xl shadow-[#635985]/25 transition hover:bg-[#393053] hover:shadow-2xl sm:w-auto"
+                to="/register"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#635985] px-8 py-4 text-base font-bold text-white shadow-xl shadow-[#635985]/25 transition hover:bg-[#393053] hover:shadow-2xl sm:w-auto"
               >
-                Launch Live Demo <ArrowRight size={18} />
+                Get Started Free <ArrowRight size={18} />
               </Link>
               <Link
-                to="/contact"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-white px-7 py-3.5 text-base font-bold text-[#18122B] shadow-sm transition hover:bg-slate-50 sm:w-auto"
+                to="/login"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-white px-8 py-4 text-base font-bold text-[#18122B] shadow-sm transition hover:bg-slate-50 sm:w-auto"
               >
-                Talk with Operations
+                Sign In to Portal
               </Link>
             </div>
 
-            {/* Quick Demo Login Pills */}
-            <div className="mt-10 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-md sm:p-5">
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                1-Click Interactive Demo (Password: <span className="font-mono text-[#18122B]">StrongPass123</span>)
-              </p>
-              <div className="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
-                {demoAccounts.map((acc) => (
-                  <button
-                    key={acc.role}
-                    onClick={() => handleQuickDemo(acc.email)}
-                    className="flex flex-col items-start rounded-xl border border-slate-100 bg-slate-50 p-3 text-left transition hover:border-[#635985]/30 hover:bg-[#635985]/5"
-                  >
-                    <div className="flex w-full items-center justify-between">
-                      <span className="text-xs font-bold text-[#18122B]">{acc.role}</span>
-                      <span className={`size-2 rounded-full ${acc.color}`} />
-                    </div>
-                    <span className="mt-1 truncate font-mono text-[11px] text-slate-500">
-                      {acc.email}
-                    </span>
-                    <span className="mt-1 text-[10px] font-medium text-[#635985]">
-                      {acc.note} →
-                    </span>
-                  </button>
-                ))}
-              </div>
+            {/* Trust Badges */}
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-xs font-semibold text-slate-500">
+              <span className="flex items-center gap-2">
+                <ShieldCheck size={16} className="text-emerald-600" /> Free 14-Day Property Setup
+              </span>
+              <span className="flex items-center gap-2">
+                <CheckCircle2 size={16} className="text-[#635985]" /> No Credit Card Required
+              </span>
+              <span className="flex items-center gap-2">
+                <Sparkles size={16} className="text-[#30AFFF]" /> Instant Tenant & Staff Invites
+              </span>
             </div>
           </div>
 
@@ -621,16 +582,16 @@ export function LandingPage() {
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 p-3.5 shadow-2xl backdrop-blur-md sm:hidden">
         <div className="flex items-center gap-2.5">
           <Link
-            to="/login"
+            to="/register"
             className="flex-1 rounded-xl bg-[#635985] py-2.5 text-center text-xs font-bold text-white shadow-md shadow-[#635985]/20"
           >
-            Launch Live Demo
+            Get Started Free
           </Link>
           <Link
-            to="/contact"
+            to="/login"
             className="rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-center text-xs font-bold text-[#18122B]"
           >
-            Contact
+            Sign In
           </Link>
         </div>
       </div>

@@ -70,7 +70,7 @@ export function ContactPage() {
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-[#18122B]">Office Headquarters</h3>
-                  <p className="text-xs text-slate-500">Main Facility & Demo Hub</p>
+                  <p className="text-xs text-slate-500">Operations & Support Center</p>
                 </div>
               </div>
               <p className="mt-4 text-sm font-semibold text-[#18122B]">
@@ -222,7 +222,7 @@ export function ContactPage() {
                     type="text"
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
-                    placeholder="e.g. Skyline Heights Onboarding"
+                    placeholder="e.g. Multi-Unit Property Onboarding"
                     className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-[#18122B] outline-none transition focus:border-[#635985] focus:bg-white focus:ring-4 focus:ring-[#635985]/10"
                   />
                 </div>

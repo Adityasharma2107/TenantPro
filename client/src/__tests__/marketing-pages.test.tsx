@@ -18,7 +18,7 @@ describe('Public Marketing Pages Integration Suite', () => {
     expect(screen.getByText(/Property maintenance,/i)).toBeInTheDocument();
     expect(screen.getByText(/resolved in real time/i)).toBeInTheDocument();
     expect(screen.getByText(/Frequently Asked Questions/i)).toBeInTheDocument();
-    expect(screen.getByText(/1-Click Interactive Demo/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Get Started Free/i).length).toBeGreaterThan(0);
   });
 
   it('renders ContactPage with office details and inquiry form', () => {
