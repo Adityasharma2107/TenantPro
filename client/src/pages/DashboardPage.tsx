@@ -30,9 +30,15 @@ export function DashboardPage() {
   });
   const user = session?.user;
 
-  const { data, isLoading, isError } = useQuery({
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ['tickets'],
-    queryFn: () => apiRequest<{ tickets: Ticket[] }>('/api/tickets?limit=100'),
+    queryFn: () => apiRequest<{ tickets: Ticket[] }>('/api/tickets?limit=50'),
   });
 
   const { data: analytics } = useQuery({
@@ -58,7 +64,7 @@ export function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="grid min-h-[40vh] place-items-center text-slate-500">
+      <div className="grid min-h-[40vh] place-items-center text-slate-500 dark:text-slate-400">
         Loading your maintenance data…
       </div>
     );
@@ -66,8 +72,18 @@ export function DashboardPage() {
 
   if (isError) {
     return (
-      <div className="mt-7 rounded-xl bg-rose-50 p-4 text-rose-700">
-        Could not load tickets. Ensure the TenantPro API is running, then refresh.
+      <div className="mx-auto my-8 max-w-lg rounded-2xl border border-rose-200 bg-rose-50 p-6 text-center text-rose-800 shadow-sm dark:border-rose-900/40 dark:bg-rose-950/30 dark:text-rose-300">
+        <CircleAlert size={36} className="mx-auto text-rose-600 dark:text-rose-400" />
+        <h2 className="mt-3 text-base font-bold">Unable to load maintenance tickets</h2>
+        <p className="mt-1 text-xs text-rose-700 dark:text-rose-400">
+          {error instanceof Error ? error.message : 'Please check your connection and try again.'}
+        </p>
+        <button
+          onClick={() => refetch()}
+          className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#635985] px-4 py-2 text-xs font-semibold text-white shadow hover:bg-[#393053]"
+        >
+          Retry Loading
+        </button>
       </div>
     );
   }

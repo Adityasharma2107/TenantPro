@@ -69,5 +69,5 @@ export const ticketListQuerySchema = z.object({
   category: z.enum(ticketCategories).optional(),
   search: z.string().trim().optional(),
   page: z.coerce.number().int().min(1).optional().default(1),
-  limit: z.coerce.number().int().min(1).max(50).optional().default(10),
+  limit: z.coerce.number().int().min(1).max(200).optional().default(10),
 });

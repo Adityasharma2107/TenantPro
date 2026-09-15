@@ -35,7 +35,7 @@ export function TechniciansPage() {
   // 2. Tickets to compute active workloads per technician
   const { data: ticketsData } = useQuery({
     queryKey: ['tickets'],
-    queryFn: () => apiRequest<{ tickets: Ticket[] }>('/api/tickets?limit=100'),
+    queryFn: () => apiRequest<{ tickets: Ticket[] }>('/api/tickets?limit=50'),
     enabled: user?.role === 'manager',
   });
 
