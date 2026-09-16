@@ -246,9 +246,17 @@ export function TechniciansPage() {
                 <div>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="grid size-11 place-items-center rounded-xl bg-[#635985] font-bold text-white shadow-sm">
-                        {initials}
-                      </div>
+                      {tech.avatarUrl ? (
+                        <img
+                          src={tech.avatarUrl}
+                          alt={tech.name}
+                          className="size-11 rounded-xl object-cover shadow-sm ring-1 ring-slate-200 dark:ring-white/10"
+                        />
+                      ) : (
+                        <div className="grid size-11 place-items-center rounded-xl bg-[#635985] font-bold text-white shadow-sm">
+                          {initials}
+                        </div>
+                      )}
                       <div>
                         <h3 className="font-bold text-[#18122B] leading-tight dark:text-white">{tech.name}</h3>
                         <p className="text-xs text-slate-400 mt-0.5">{tech.email}</p>

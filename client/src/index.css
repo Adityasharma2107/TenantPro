@@ -42,7 +42,7 @@ button, input { font: inherit; }
 #root > div.min-h-screen article:nth-of-type(3) { animation-delay: 140ms; }
 
 /* The login illustration uses the original asset under a readable violet overlay. */
-#root .bg-gradient-to-br {
+#root > main.min-h-screen section.bg-gradient-to-br {
   background-image:
     linear-gradient(145deg, rgb(24 18 43 / .94), rgb(57 48 83 / .78), rgb(99 89 133 / .74)),
     url('./assets/tenantpro-building-hero.png') !important;

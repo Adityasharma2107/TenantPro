@@ -404,10 +404,21 @@ export function TicketDetailsPage() {
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-sm text-[#18122B]">
+                          {comment.author?.avatarUrl ? (
+                            <img
+                              src={comment.author.avatarUrl}
+                              alt={comment.author.name}
+                              className="size-6 rounded-full object-cover ring-1 ring-slate-200 dark:ring-white/10"
+                            />
+                          ) : (
+                            <span className="grid size-6 place-items-center rounded-full bg-slate-200 text-[10px] font-bold text-slate-700 dark:bg-white/10 dark:text-slate-300">
+                              {comment.author?.name ? comment.author.name[0].toUpperCase() : 'U'}
+                            </span>
+                          )}
+                          <span className="font-semibold text-sm text-[#18122B] dark:text-white">
                             {comment.author?.name}
                           </span>
-                          <span className="rounded-full bg-slate-200/80 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-600">
+                          <span className="rounded-full bg-slate-200/80 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:bg-white/10 dark:text-slate-300">
                             {authorRole}
                           </span>
                         </div>
@@ -484,22 +495,35 @@ export function TicketDetailsPage() {
             </div>
 
             {/* Manager: Technician Assignment */}
-            <div className="mt-5 border-t border-slate-100 pt-4">
+            <div className="mt-5 border-t border-slate-100 pt-4 dark:border-white/10">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-medium text-slate-500">Assigned Technician</p>
-                  <p className="text-sm font-semibold text-[#18122B] mt-0.5">
-                    {assignedTech ? assignedTech.name : 'Unassigned'}
-                  </p>
-                  {assignedTech?.specialization && (
-                    <p className="text-xs text-slate-400">{assignedTech.specialization}</p>
+                <div className="flex items-center gap-3">
+                  {assignedTech?.avatarUrl ? (
+                    <img
+                      src={assignedTech.avatarUrl}
+                      alt={assignedTech.name}
+                      className="size-9 rounded-full object-cover shadow-sm ring-1 ring-slate-200 dark:ring-white/10"
+                    />
+                  ) : (
+                    <span className="grid size-9 place-items-center rounded-full bg-purple-50 text-[#635985] dark:bg-white/10 dark:text-[#92EEFF]">
+                      <Wrench size={16} />
+                    </span>
                   )}
+                  <div>
+                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Assigned Technician</p>
+                    <p className="text-sm font-semibold text-[#18122B] mt-0.5 dark:text-white">
+                      {assignedTech ? assignedTech.name : 'Unassigned'}
+                    </p>
+                    {assignedTech?.specialization && (
+                      <p className="text-xs text-slate-400">{assignedTech.specialization}</p>
+                    )}
+                  </div>
                 </div>
 
                 {canManageAssignment && (
                   <button
                     onClick={() => setIsAssignOpen(true)}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-[#635985] hover:bg-slate-50 shadow-sm"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-[#635985] hover:bg-slate-50 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-[#92EEFF]"
                   >
                     <Wrench size={14} />
                     {assignedTech ? 'Reassign' : 'Assign'}
@@ -509,8 +533,8 @@ export function TicketDetailsPage() {
             </div>
 
             {/* Manager: Priority Adjustment */}
-            <div className="mt-5 border-t border-slate-100 pt-4">
-              <p className="text-xs font-medium text-slate-500">Priority Level</p>
+            <div className="mt-5 border-t border-slate-100 pt-4 dark:border-white/10">
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Priority Level</p>
               {canManagePriority ? (
                 <div className="mt-2">
                   <select
@@ -534,14 +558,22 @@ export function TicketDetailsPage() {
             </div>
 
             {/* Resident / Tenant Info */}
-            <div className="mt-5 border-t border-slate-100 pt-4">
-              <p className="text-xs font-medium text-slate-500">Reported By</p>
+            <div className="mt-5 border-t border-slate-100 pt-4 dark:border-white/10">
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Reported By</p>
               <div className="mt-2 flex items-center gap-3">
-                <span className="grid size-8 place-items-center rounded-full bg-slate-100 text-slate-600">
-                  <User size={16} />
-                </span>
+                {tenant?.avatarUrl ? (
+                  <img
+                    src={tenant.avatarUrl}
+                    alt={tenant.name}
+                    className="size-8 rounded-full object-cover shadow-sm ring-1 ring-slate-200 dark:ring-white/10"
+                  />
+                ) : (
+                  <span className="grid size-8 place-items-center rounded-full bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-slate-300">
+                    <User size={16} />
+                  </span>
+                )}
                 <div>
-                  <p className="text-sm font-semibold text-slate-800">
+                  <p className="text-sm font-semibold text-slate-800 dark:text-white">
                     {tenant ? tenant.name : 'Resident'}
                   </p>
                   {tenant?.unitNumber && (

@@ -35,6 +35,7 @@ export const updateProfileSchema = z.object({
   name: z.string().trim().min(2, 'Name must contain at least 2 characters.').max(80).optional(),
   unitNumber: z.string().trim().max(30).optional(),
   specialization: z.string().trim().max(80).optional(),
+  avatarUrl: z.string().trim().optional().or(z.literal('')),
 });
 
 export const changePasswordSchema = z.object({

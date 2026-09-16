@@ -127,7 +127,7 @@ export function NotificationDropdown() {
 
       {/* Popover Dropdown Panel */}
       {isOpen && (
-        <div className="absolute right-0 top-12 z-50 w-80 sm:w-96 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl animate-in fade-in slide-in-from-top-2 duration-150 dark:border-white/10 dark:bg-[#1E1735]">
+        <div className="fixed inset-x-3 top-18 sm:inset-x-auto sm:absolute sm:right-0 sm:top-12 z-50 sm:w-96 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl animate-in fade-in slide-in-from-top-2 duration-150 dark:border-white/10 dark:bg-[#1E1735]">
           {/* Dropdown Header */}
           <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/70 px-4 py-3 dark:border-white/10 dark:bg-white/5">
             <div className="flex items-center gap-2">

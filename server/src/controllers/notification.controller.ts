@@ -27,7 +27,7 @@ export const sendNotification = async (params: {
     });
 
     const populated = await Notification.findById(doc._id)
-      .populate('actor', 'name email role')
+      .populate('actor', 'name email role avatarUrl')
       .populate('ticket', 'title location status priority');
 
     emitNotification(params.recipient.toString(), populated);
@@ -46,7 +46,7 @@ export const listNotifications: RequestHandler = async (request, response) => {
     Notification.find({ recipient: userId })
       .sort({ createdAt: -1 })
       .limit(30)
-      .populate('actor', 'name email role')
+      .populate('actor', 'name email role avatarUrl')
       .populate('ticket', 'title location status priority'),
     Notification.countDocuments({ recipient: userId, read: false }),
   ]);

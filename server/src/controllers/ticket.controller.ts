@@ -144,8 +144,8 @@ export const listTickets: RequestHandler = async (request, response) => {
 
   const [tickets, total] = await Promise.all([
     Ticket.find(filter)
-      .populate('tenant', 'name email unitNumber')
-      .populate('assignedTechnician', 'name email specialization')
+      .populate('tenant', 'name email unitNumber avatarUrl')
+      .populate('assignedTechnician', 'name email specialization avatarUrl')
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit),
@@ -169,9 +169,9 @@ export const getTicketById: RequestHandler = async (request, response) => {
 
   const [ticketWithPeople, comments, activities] = await Promise.all([
     Ticket.findById(ticket._id)
-      .populate('tenant', 'name email unitNumber')
-      .populate('assignedTechnician', 'name email specialization'),
-    Comment.find({ ticket: ticket._id }).populate('author', 'name role').sort({ createdAt: 1 }),
+      .populate('tenant', 'name email unitNumber avatarUrl')
+      .populate('assignedTechnician', 'name email specialization avatarUrl'),
+    Comment.find({ ticket: ticket._id }).populate('author', 'name role avatarUrl').sort({ createdAt: 1 }),
     ActivityLog.find({ ticket: ticket._id }).populate('actor', 'name role').sort({ createdAt: 1 }),
   ]);
 
@@ -336,7 +336,7 @@ export const addComment: RequestHandler = async (request, response) => {
   });
   await addActivity(ticket._id, request.user!.userId, 'comment_added', 'Added a comment.');
 
-  const populatedComment = await comment.populate('author', 'name role');
+  const populatedComment = await comment.populate('author', 'name role avatarUrl');
   emitCommentAdded(ticket.property.toString(), ticket._id.toString(), populatedComment);
 
   // Notify other participants if database is connected

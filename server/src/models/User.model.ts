@@ -11,6 +11,7 @@ export interface IUser {
   property: Types.ObjectId;
   unitNumber?: string;
   specialization?: string;
+  avatarUrl?: string;
   isActive: boolean;
 }
 
@@ -27,6 +28,7 @@ const userSchema = new Schema<IUser>(
     unitNumber: { type: String, trim: true, maxlength: 30 },
     // Technicians can be tagged with a skill such as plumbing or electrical work.
     specialization: { type: String, trim: true, maxlength: 80 },
+    avatarUrl: { type: String, trim: true },
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true },

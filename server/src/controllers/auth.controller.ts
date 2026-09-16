@@ -26,6 +26,7 @@ const toPublicUser = (user: {
   isActive: boolean;
   unitNumber?: string;
   specialization?: string;
+  avatarUrl?: string;
 }) => ({
   id: user._id.toString(),
   name: user.name,
@@ -35,6 +36,7 @@ const toPublicUser = (user: {
   isActive: user.isActive,
   unitNumber: user.unitNumber,
   specialization: user.specialization,
+  avatarUrl: user.avatarUrl,
 });
 
 // Creates the first manager account and the property that account manages.
@@ -153,10 +155,11 @@ export const updateProfile: RequestHandler = async (request, response) => {
     return response.status(401).json({ message: 'User account not found or deactivated.' });
   }
 
-  const { name, unitNumber, specialization } = result.data;
+  const { name, unitNumber, specialization, avatarUrl } = result.data;
   if (name !== undefined) user.name = name;
   if (unitNumber !== undefined && user.role === 'tenant') user.unitNumber = unitNumber;
   if (specialization !== undefined && user.role === 'technician') user.specialization = specialization;
+  if (avatarUrl !== undefined) user.avatarUrl = avatarUrl;
 
   await user.save();
 

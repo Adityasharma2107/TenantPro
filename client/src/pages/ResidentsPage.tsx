@@ -216,9 +216,17 @@ export function ResidentsPage() {
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="grid size-9 place-items-center rounded-full bg-[#393053] text-xs font-bold text-white shadow-sm dark:bg-[#635985]">
-                            {initials}
-                          </div>
+                          {resident.avatarUrl ? (
+                            <img
+                              src={resident.avatarUrl}
+                              alt={resident.name}
+                              className="size-9 rounded-full object-cover shadow-sm ring-1 ring-slate-200 dark:ring-white/10"
+                            />
+                          ) : (
+                            <div className="grid size-9 place-items-center rounded-full bg-[#393053] text-xs font-bold text-white shadow-sm dark:bg-[#635985]">
+                              {initials}
+                            </div>
+                          )}
                           <div>
                             <p className="font-semibold text-[#18122B] dark:text-white">
                               {resident.name}

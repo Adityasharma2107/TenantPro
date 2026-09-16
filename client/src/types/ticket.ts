@@ -8,6 +8,7 @@ export interface CurrentUser {
   propertyId: string;
   unitNumber?: string;
   specialization?: string;
+  avatarUrl?: string;
 }
 
 export interface PropertyData {
@@ -57,6 +58,7 @@ export interface PopulatedUser {
   email: string;
   unitNumber?: string;
   specialization?: string;
+  avatarUrl?: string;
 }
 
 export interface TicketExpense {
@@ -94,6 +96,7 @@ export interface CommentItem {
     _id: string;
     name: string;
     role: UserRole;
+    avatarUrl?: string;
   };
   message: string;
   createdAt: string;
@@ -146,6 +149,7 @@ export interface TeamMember {
   propertyName?: string;
   unitNumber?: string;
   specialization?: string;
+  avatarUrl?: string;
   isActive: boolean;
 }
 
@@ -157,6 +161,7 @@ export interface NotificationItem {
     name: string;
     email: string;
     role: string;
+    avatarUrl?: string;
   };
   ticket?: {
     _id: string;

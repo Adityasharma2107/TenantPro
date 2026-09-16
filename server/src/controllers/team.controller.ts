@@ -15,6 +15,7 @@ const toPublicTeamMember = (user: {
   property?: any;
   unitNumber?: string;
   specialization?: string;
+  avatarUrl?: string;
   isActive: boolean;
 }) => ({
   id: user._id.toString(),
@@ -25,6 +26,7 @@ const toPublicTeamMember = (user: {
   propertyName: user.property?.name,
   unitNumber: user.unitNumber,
   specialization: user.specialization,
+  avatarUrl: user.avatarUrl,
   isActive: user.isActive,
 });
 

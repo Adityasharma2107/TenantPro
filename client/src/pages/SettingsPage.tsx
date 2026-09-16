@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   AlertCircle,
   Bell,
+  Camera,
   CheckCircle2,
   Eye,
   EyeOff,
@@ -10,9 +11,10 @@ import {
   Lock,
   LogOut,
   Shield,
+  Trash2,
   User,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { apiRequest } from '../lib/api';
 import { disconnectSocket } from '../lib/socket';
 import type { CurrentUser } from '../types/ticket';
@@ -20,6 +22,8 @@ import type { CurrentUser } from '../types/ticket';
 export function SettingsPage() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const location = useLocation();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: session } = useQuery({
     queryKey: ['current-user'],
@@ -31,6 +35,7 @@ export function SettingsPage() {
   const [name, setName] = useState('');
   const [unitNumber, setUnitNumber] = useState('');
   const [specialization, setSpecialization] = useState('');
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [profileSuccess, setProfileSuccess] = useState('');
   const [profileError, setProfileError] = useState('');
 
@@ -42,6 +47,16 @@ export function SettingsPage() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [passwordSuccess, setPasswordSuccess] = useState('');
   const [passwordError, setPasswordError] = useState('');
+
+  // Smooth scroll to profile if hash is present
+  useEffect(() => {
+    if (location.hash === '#profile') {
+      const el = document.getElementById('profile');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, [location.hash]);
 
   // Notification Preferences States (Persisted in localStorage)
   const [notifications, setNotifications] = useState(() => {
@@ -103,7 +118,7 @@ export function SettingsPage() {
 
   // Profile Update Mutation
   const profileMutation = useMutation({
-    mutationFn: (payload: { name: string; unitNumber?: string; specialization?: string }) =>
+    mutationFn: (payload: { name?: string; unitNumber?: string; specialization?: string; avatarUrl?: string }) =>
       apiRequest<{ message: string; user: CurrentUser }>('/api/auth/profile', {
         method: 'PATCH',
         body: JSON.stringify(payload),
@@ -119,6 +134,50 @@ export function SettingsPage() {
       setProfileSuccess('');
     },
   });
+
+  const handleAvatarFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setProfileError('Image size must be less than 5MB.');
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+    setProfileError('');
+    try {
+      const formData = new FormData();
+      formData.append('images', file);
+      const res = await apiRequest<{ urls: string[] }>('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      if (res.urls && res.urls[0]) {
+        profileMutation.mutate({
+          name: name || user?.name,
+          unitNumber: user?.role === 'tenant' ? unitNumber : undefined,
+          specialization: user?.role === 'technician' ? specialization : undefined,
+          avatarUrl: res.urls[0],
+        });
+      }
+    } catch (err: any) {
+      setProfileError(err.message || 'Failed to upload photo. Please try again.');
+    } finally {
+      setIsUploadingAvatar(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveAvatar = () => {
+    setProfileError('');
+    profileMutation.mutate({
+      name: name || user?.name,
+      unitNumber: user?.role === 'tenant' ? unitNumber : undefined,
+      specialization: user?.role === 'technician' ? specialization : undefined,
+      avatarUrl: '',
+    });
+  };
 
   const handleProfileSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -203,23 +262,31 @@ export function SettingsPage() {
       {/* Header & Avatar Banner */}
       <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
-          <div className="grid size-16 place-items-center rounded-2xl bg-gradient-to-br from-[#635985] to-[#393053] text-xl font-bold text-white shadow-lg shadow-[#635985]/20">
-            {initials}
-          </div>
+          {user?.avatarUrl ? (
+            <img
+              src={user.avatarUrl}
+              alt={user.name}
+              className="size-16 rounded-2xl object-cover shadow-lg shadow-[#635985]/20 ring-2 ring-[#635985]/30"
+            />
+          ) : (
+            <div className="grid size-16 place-items-center rounded-2xl bg-gradient-to-br from-[#635985] to-[#393053] text-xl font-bold text-white shadow-lg shadow-[#635985]/20">
+              {initials}
+            </div>
+          )}
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold text-[#18122B]">{user?.name}</h1>
-              <span className="rounded-full bg-[#635985]/10 px-2.5 py-0.5 text-xs font-bold capitalize text-[#635985]">
+              <h1 className="text-2xl font-bold text-[#18122B] dark:text-white">{user?.name}</h1>
+              <span className="rounded-full bg-[#635985]/10 px-2.5 py-0.5 text-xs font-bold capitalize text-[#635985] dark:bg-white/10 dark:text-[#92EEFF]">
                 {user?.role}
               </span>
             </div>
-            <p className="mt-0.5 text-sm text-slate-500">{user?.email}</p>
+            <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">{user?.email}</p>
           </div>
         </div>
 
         <button
           onClick={() => logout.mutate()}
-          className="inline-flex items-center gap-2 self-start rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 sm:self-auto"
+          className="inline-flex items-center gap-2 self-start rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 sm:self-auto dark:border-rose-900/40 dark:bg-rose-950/30 dark:text-rose-300 dark:hover:bg-rose-900/40"
         >
           <LogOut size={16} /> Sign Out
         </button>
@@ -227,30 +294,86 @@ export function SettingsPage() {
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         {/* Section 1: Profile Information */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
-          <div className="flex items-center gap-2.5 border-b border-slate-100 pb-4">
-            <div className="grid size-8 place-items-center rounded-lg bg-[#635985]/10 text-[#635985]">
+        <div id="profile" className="scroll-mt-24 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-[#1E1735]">
+          <div className="flex items-center gap-2.5 border-b border-slate-100 pb-4 dark:border-white/10">
+            <div className="grid size-8 place-items-center rounded-lg bg-[#635985]/10 text-[#635985] dark:bg-white/10 dark:text-[#92EEFF]">
               <User size={16} />
             </div>
             <div>
-              <h2 className="text-base font-bold text-[#18122B]">Personal Profile</h2>
-              <p className="text-xs text-slate-500">Update how your identity appears on work orders</p>
+              <h2 className="text-base font-bold text-[#18122B] dark:text-white">Personal Profile</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Update how your identity appears on work orders</p>
             </div>
           </div>
 
           {profileSuccess && (
-            <div className="mt-4 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs font-semibold text-emerald-700">
+            <div className="mt-4 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs font-semibold text-emerald-700 dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-300">
               <CheckCircle2 size={16} />
               {profileSuccess}
             </div>
           )}
 
           {profileError && (
-            <div className="mt-4 flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs font-semibold text-rose-700">
+            <div className="mt-4 flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs font-semibold text-rose-700 dark:border-rose-800/40 dark:bg-rose-950/30 dark:text-rose-300">
               <AlertCircle size={16} />
               {profileError}
             </div>
           )}
+
+          {/* Profile Picture Upload Section */}
+          <div className="mt-5 flex flex-wrap items-center gap-4 rounded-xl border border-slate-100 bg-slate-50/70 p-4 dark:border-white/5 dark:bg-white/5">
+            <div className="relative shrink-0">
+              {user?.avatarUrl ? (
+                <img
+                  src={user.avatarUrl}
+                  alt={user.name}
+                  className="size-16 rounded-2xl object-cover ring-2 ring-[#635985]/30 shadow-sm"
+                />
+              ) : (
+                <div className="grid size-16 place-items-center rounded-2xl bg-[#635985] text-lg font-bold text-white shadow-sm">
+                  {initials}
+                </div>
+              )}
+              {isUploadingAvatar && (
+                <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/60 text-white backdrop-blur-[2px]">
+                  <div className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-1">
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Profile Photo</p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                Supports PNG, JPG, or WEBP up to 5MB. Visible on tickets and assignments.
+              </p>
+              <div className="flex items-center gap-2 pt-1.5">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleAvatarFileChange}
+                  accept="image/png,image/jpeg,image/jpg,image/webp"
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  disabled={isUploadingAvatar || profileMutation.isPending}
+                  onClick={() => fileInputRef.current?.click()}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-[#635985] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-[#393053] dark:hover:bg-[#443C68] disabled:opacity-50"
+                >
+                  <Camera size={13} /> {isUploadingAvatar ? 'Uploading…' : 'Upload Photo'}
+                </button>
+                {user?.avatarUrl && (
+                  <button
+                    type="button"
+                    disabled={isUploadingAvatar || profileMutation.isPending}
+                    onClick={handleRemoveAvatar}
+                    className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100 dark:border-white/10 dark:text-slate-300 dark:hover:bg-white/10"
+                  >
+                    <Trash2 size={13} className="text-rose-500" /> Remove
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
 
           <form onSubmit={handleProfileSubmit} className="mt-5 space-y-4">
             <div>

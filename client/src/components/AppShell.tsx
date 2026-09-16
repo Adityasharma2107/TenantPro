@@ -253,9 +253,17 @@ export function AppShell({ children }: AppShellProps) {
 
         <div className="mt-auto">
           <div className="flex items-center gap-3 border-t border-white/10 px-2 pt-4">
-            <div className="grid size-9 place-items-center rounded-full bg-[#D8FFC5] text-sm font-bold text-[#393053]">
-              {initials}
-            </div>
+            {user.avatarUrl ? (
+              <img
+                src={user.avatarUrl}
+                alt={user.name}
+                className="size-9 rounded-full object-cover ring-1 ring-white/20"
+              />
+            ) : (
+              <div className="grid size-9 place-items-center rounded-full bg-[#D8FFC5] text-sm font-bold text-[#393053]">
+                {initials}
+              </div>
+            )}
             {!collapsed && (
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold text-white">{user.name}</p>
@@ -280,67 +288,83 @@ export function AppShell({ children }: AppShellProps) {
           collapsed ? 'lg:pl-[88px]' : 'lg:pl-[280px]'
         }`}
       >
-        <header className="sticky top-0 z-20 flex h-20 items-center gap-4 border-b border-slate-200 bg-white/90 px-5 backdrop-blur lg:px-8">
-          <button
-            onClick={() => setMobileOpen(true)}
-            className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 lg:hidden"
-            aria-label="Open navigation"
-          >
-            <Menu size={21} />
-          </button>
+        <header className="sticky top-0 z-20 flex h-16 sm:h-20 items-center justify-between gap-2 sm:gap-4 border-b border-slate-200 bg-white/90 px-3.5 sm:px-6 lg:px-8 backdrop-blur dark:border-white/10 dark:bg-[#18122B]/90">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <button
+              onClick={() => setMobileOpen(true)}
+              className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10 lg:hidden shrink-0"
+              aria-label="Open navigation"
+            >
+              <Menu size={21} />
+            </button>
 
-          {/* Dynamic Breadcrumbs */}
-          <nav aria-label="Breadcrumbs" className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500">
-            <Link to="/app/dashboard" className="hover:text-[#18122B] transition-colors font-medium">
-              Workspace
-            </Link>
-            {getBreadcrumbs().map((crumb, idx) => (
-              <div key={idx} className="flex items-center gap-1.5">
-                <ChevronRight size={13} className="text-slate-400" />
-                {crumb.to ? (
-                  <Link to={crumb.to} className="hover:text-[#18122B] transition-colors font-medium">
-                    {crumb.label}
-                  </Link>
-                ) : (
-                  <span className="font-bold text-[#18122B]">{crumb.label}</span>
-                )}
-              </div>
-            ))}
-          </nav>
+            {/* Dynamic Breadcrumbs */}
+            <nav aria-label="Breadcrumbs" className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+              <Link to="/app/dashboard" className="hover:text-[#18122B] dark:hover:text-white transition-colors font-medium">
+                Workspace
+              </Link>
+              {getBreadcrumbs().map((crumb, idx) => (
+                <div key={idx} className="flex items-center gap-1.5">
+                  <ChevronRight size={13} className="text-slate-400" />
+                  {crumb.to ? (
+                    <Link to={crumb.to} className="hover:text-[#18122B] dark:hover:text-white transition-colors font-medium">
+                      {crumb.label}
+                    </Link>
+                  ) : (
+                    <span className="font-bold text-[#18122B] dark:text-white">{crumb.label}</span>
+                  )}
+                </div>
+              ))}
+            </nav>
 
-          <div className="hidden xl:block ml-4 pl-4 border-l border-slate-200">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Signed in as</p>
-            <p className="text-xs font-semibold text-[#18122B]">{user.email}</p>
+            <div className="hidden xl:block ml-4 pl-4 border-l border-slate-200 dark:border-white/10">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Signed in as</p>
+              <p className="text-xs font-semibold text-[#18122B] dark:text-white">{user.email}</p>
+            </div>
           </div>
 
-          <form onSubmit={handleSearchSubmit} className="relative ml-auto hidden w-full max-w-sm md:block">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm outline-none focus:border-[#635985] focus:ring-4 focus:ring-[#635985]/10"
-              placeholder="Search tickets by title or location..."
-            />
-          </form>
+          <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
+            <form onSubmit={handleSearchSubmit} className="relative hidden w-64 lg:w-80 md:block">
+              <Search size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-9 pr-4 text-xs outline-none focus:border-[#635985] focus:ring-2 focus:ring-[#635985]/15 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder-slate-500"
+                placeholder="Search tickets by title..."
+              />
+            </form>
 
-          {user.role === 'tenant' && (
-            <button
-              onClick={() => setIsCreateOpen(true)}
-              className="hidden sm:inline-flex items-center gap-2 rounded-xl bg-[#635985] px-4 py-2 text-xs font-semibold text-white shadow-md shadow-[#635985]/20 hover:bg-[#393053]"
-            >
-              <Plus size={16} /> Report issue
-            </button>
-          )}
+            {user.role === 'tenant' && (
+              <button
+                onClick={() => setIsCreateOpen(true)}
+                className="hidden sm:inline-flex items-center gap-1.5 rounded-xl bg-[#635985] px-3.5 py-2 text-xs font-semibold text-white shadow-md shadow-[#635985]/20 hover:bg-[#393053]"
+              >
+                <Plus size={15} /> Report issue
+              </button>
+            )}
 
-          <div className="flex items-center gap-2">
             <ThemeToggle />
             <NotificationDropdown />
-            <div
-              className="grid size-10 place-items-center rounded-xl bg-gradient-to-br from-[#18122B] to-[#635985] text-xs font-bold text-white shadow-sm ring-1 ring-slate-200 dark:ring-white/10"
-              title={user.name}
+
+            {/* Profile Button - Directs directly to Profile in Settings */}
+            <Link
+              to="/app/settings#profile"
+              className="group relative grid size-10 shrink-0 place-items-center rounded-xl overflow-hidden ring-1 ring-slate-200 dark:ring-white/15 transition-all hover:ring-2 hover:ring-[#635985] focus:outline-none focus:ring-2 focus:ring-[#635985]"
+              title={`${user.name} — Profile & Settings`}
+              aria-label="View Profile & Settings"
             >
-              {initials}
-            </div>
+              {user.avatarUrl ? (
+                <img
+                  src={user.avatarUrl}
+                  alt={user.name}
+                  className="size-full object-cover transition group-hover:scale-105"
+                />
+              ) : (
+                <div className="grid size-full place-items-center bg-[#635985] text-xs font-bold text-white transition group-hover:bg-[#393053]">
+                  {initials}
+                </div>
+              )}
+            </Link>
           </div>
         </header>
 
