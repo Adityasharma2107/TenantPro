@@ -115,7 +115,7 @@ export function PrivacyPolicyPage() {
             </p>
             <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-xs">
               <p className="font-bold text-[#18122B]">TenantPro Technologies Inc. — Data Protection</p>
-              <p className="mt-1 text-slate-600">100 Panorama Way, Austin, TX 78701</p>
+              <p className="mt-1 text-slate-600">Plot 42, Commercial Complex, Zone-I, MP Nagar, Bhopal, MP 462011</p>
               <p className="mt-1 text-slate-600">
                 Email: <a href="mailto:privacy@tenantpro.com" className="font-bold text-[#635985] hover:underline">privacy@tenantpro.com</a>
               </p>

@@ -23,15 +23,15 @@ export function Footer() {
             <div className="space-y-2.5 pt-2 text-sm text-slate-300">
               <div className="flex items-center gap-2.5">
                 <MapPin size={16} className="text-[#92EEFF]" />
-                <span>100 Panorama Way, Austin, TX 78701</span>
+                <span>Zone-I, MP Nagar, Bhopal, MP 462011</span>
               </div>
               <div>
                 <a
-                  href="tel:+15125550199"
+                  href="tel:+919826000199"
                   className="flex items-center gap-2.5 transition hover:text-white"
                 >
                   <Phone size={16} className="text-[#92EEFF]" />
-                  <span>(512) 555-0199</span>
+                  <span>+91 98260 00199</span>
                 </a>
               </div>
               <div>

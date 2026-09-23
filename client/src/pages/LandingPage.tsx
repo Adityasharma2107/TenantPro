@@ -54,40 +54,40 @@ export function LandingPage() {
 
   const testimonials = [
     {
-      name: 'Marcus Vance',
+      name: 'Rajesh Sharma',
       role: 'Senior Property Director',
-      property: 'Skyline Heights Residences (Austin, TX)',
+      property: 'Gulmohar Enclave (Bhopal, MP)',
       stars: 5,
       content:
-        'TenantPro reduced our maintenance response turnaround from 4 days to under 6 hours. The real-time dispatch and timestamped photo logs eliminate tenant disputes entirely.',
-      avatar: 'MV',
+        'TenantPro reduced our maintenance response turnaround from 4 days to under 6 hours. The real-time dispatch and timestamped photo logs eliminate resident disputes entirely.',
+      avatar: 'RS',
     },
     {
-      name: 'Elena Rostova',
+      name: 'Priya Patel',
       role: 'Resident (Unit 4B)',
-      property: 'Skyline Heights',
+      property: 'Arera Colony Heights (Bhopal, MP)',
       stars: 5,
       content:
         'Filing an issue takes literally 30 seconds on my phone. Being able to see when the technician is dispatched and getting an instant resolution confirmation is a breath of fresh air.',
-      avatar: 'ER',
+      avatar: 'PP',
     },
     {
-      name: 'David Chen',
-      role: 'Lead HVAC & Plumbing Contractor',
-      property: 'Precision Maintenance Group',
+      name: 'Amit Verma',
+      role: 'Lead Electrical & Plumbing Specialist',
+      property: 'Verma Facility Care (Bhopal, MP)',
       stars: 5,
       content:
         'The mobile technician queue is built right for on-site trades. I see the photo of the leak before I even step into the unit, grab the right parts, and close the job right from my phone.',
-      avatar: 'DC',
+      avatar: 'AV',
     },
     {
-      name: 'Sophia Martinez',
+      name: 'Ananya Deshmukh',
       role: 'Community Operations Manager',
-      property: 'Vista Ridge Apartments',
+      property: 'Shubhangan Towers, MP Nagar (Bhopal, MP)',
       stars: 5,
       content:
         'The occupancy dashboard, automated audit trails, and technician leaderboard give our ownership team complete operational transparency.',
-      avatar: 'SM',
+      avatar: 'AD',
     },
   ];
 
@@ -172,7 +172,7 @@ export function LandingPage() {
                   <div className="rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur">
                     <p className="text-xs font-semibold text-slate-400">Building Occupancy</p>
                     <p className="mt-1 text-2xl font-black text-white">96%</p>
-                    <p className="mt-1 text-xs text-slate-400">Skyline Heights • 48 Units</p>
+                    <p className="mt-1 text-xs text-slate-400">Gulmohar Enclave • 48 Units (Bhopal)</p>
                   </div>
                 </div>
 

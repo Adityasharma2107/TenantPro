@@ -32,8 +32,8 @@ export function ThankYouPage() {
           <p className="font-bold text-[#18122B] text-sm">Need immediate emergency support?</p>
           <p className="mt-1">
             Call our direct dispatch desk anytime at{' '}
-            <a href="tel:+15125550199" className="font-bold text-[#635985] hover:underline">
-              (512) 555-0199
+            <a href="tel:+919826000199" className="font-bold text-[#635985] hover:underline">
+              +91 98260 00199
             </a>{' '}
             or sign in to your operations workspace.
           </p>

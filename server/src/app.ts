@@ -3,8 +3,10 @@ import cookieParser from 'cookie-parser';
 import express from 'express';
 import helmet from 'helmet';
 
+import { csrfProtection } from './middlewares/csrf.middleware.js';
 import { errorHandler, notFoundHandler } from './middlewares/error.middleware.js';
 import { apiRateLimiter } from './middlewares/rate-limit.middleware.js';
+import { sanitizeInput } from './middlewares/sanitize.middleware.js';
 import analyticsRouter from './routes/analytics.routes.js';
 import authRouter from './routes/auth.routes.js';
 import notificationRouter from './routes/notification.routes.js';
@@ -15,10 +17,29 @@ import uploadRouter from './routes/upload.routes.js';
 
 const app = express();
 
-// Adds security-related HTTP response headers, permitting cross-origin media rendering.
+// Trust reverse proxy (Vercel, Render, AWS, Fly.io) for secure cookies and protocol inspection
+app.set('trust proxy', 1);
+
+// Hide Express fingerprint to prevent targeted server scanner attacks
+app.disable('x-powered-by');
+
+// Adds comprehensive security HTTP response headers (CSP, HSTS, frame protection, anti-sniffing)
 app.use(
   helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:', 'https:', 'blob:'],
+        connectSrc: ["'self'", 'https:', 'wss:', 'ws:'],
+      },
+    },
     crossOriginResourcePolicy: { policy: 'cross-origin' },
+    crossOriginOpenerPolicy: { policy: 'same-origin' },
+    hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
+    frameguard: { action: 'deny' },
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
   }),
 );
 
@@ -38,7 +59,7 @@ const isOriginAllowed = (origin: string | undefined): boolean => {
   return false;
 };
 
-// Allows the React application to call this API and send authentication cookies later.
+// Allows the React application to call this API with strict CORS origin and header controls.
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -48,17 +69,27 @@ app.use(
       return callback(null, false);
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-TenantPro-CSRF'],
+    maxAge: 86400,
   }),
 );
 
-// Global rate limiter across API paths to mitigate abuse.
+// Global rate limiter across API paths to mitigate denial-of-service and brute force abuse.
 app.use('/api', apiRateLimiter);
 
-// Converts JSON request bodies into JavaScript objects for API routes.
-app.use(express.json());
+// Payload size speed cap: rejects bloated payloads (1MB cap) to guard against memory exhaustion
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
-// Reads the HTTP-only authentication cookie sent by the browser.
+// Input sanitization: strips MongoDB query operators ($ and .) and neutralizes script injection
+app.use(sanitizeInput);
+
+// Reads HTTP-only authentication cookies sent by verified clients
 app.use(cookieParser());
+
+// Anti-CSRF protection: validates custom headers and origins on state-changing requests
+app.use('/api', csrfProtection);
 
 // A small endpoint used to confirm that the API process is alive.
 app.get('/api/health', (_request, response) => {

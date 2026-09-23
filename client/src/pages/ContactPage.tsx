@@ -74,7 +74,7 @@ export function ContactPage() {
                 </div>
               </div>
               <p className="mt-4 text-sm font-semibold text-[#18122B]">
-                100 Panorama Way<br />Austin, TX 78701<br />United States
+                Plot 42, Commercial Complex, Zone-I<br />MP Nagar, Bhopal, MP 462011<br />India
               </p>
             </div>
 
@@ -90,10 +90,10 @@ export function ContactPage() {
               </div>
               <div className="mt-4 space-y-1">
                 <a
-                  href="tel:+15125550199"
+                  href="tel:+919826000199"
                   className="block text-sm font-bold text-[#18122B] transition hover:text-[#635985]"
                 >
-                  (512) 555-0199
+                  +91 98260 00199
                 </a>
                 <p className="text-xs text-slate-500">Direct operations desk</p>
               </div>
@@ -127,7 +127,7 @@ export function ContactPage() {
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-[#18122B]">Operating Hours</h3>
-                  <p className="text-xs text-slate-500">Central Standard Time (CST)</p>
+                  <p className="text-xs text-slate-500">Indian Standard Time (IST)</p>
                 </div>
               </div>
               <div className="mt-4 space-y-1 text-xs text-slate-600">

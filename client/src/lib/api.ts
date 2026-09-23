@@ -25,7 +25,11 @@ export async function apiRequest<T>(path: string, options: RequestInit = {}): Pr
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...options.headers },
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+      ...options.headers,
+    },
   });
 
   const data = await response.json().catch(() => ({}));
@@ -40,6 +44,9 @@ export async function uploadImagesRequest(files: File[]): Promise<string[]> {
   const response = await fetch(`${API_BASE_URL}/api/upload`, {
     method: 'POST',
     credentials: 'include',
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+    },
     body: formData,
   });
 

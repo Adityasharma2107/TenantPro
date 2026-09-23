@@ -38,12 +38,12 @@ export function Navbar() {
 
           <div className="flex items-center gap-5 text-white/70">
             <a
-              href="tel:+15125550199"
+              href="tel:+919826000199"
               className="flex items-center gap-1.5 transition-colors hover:text-white"
               title="Call Leasing & Support Office"
             >
               <Phone size={13} className="text-[#92EEFF]" />
-              <span className="hidden md:inline">(512) 555-0199</span>
+              <span className="hidden md:inline">+91 98260 00199</span>
             </a>
             <a
               href="mailto:support@tenantpro.com"

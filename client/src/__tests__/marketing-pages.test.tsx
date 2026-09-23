@@ -29,7 +29,7 @@ describe('Public Marketing Pages Integration Suite', () => {
     );
 
     expect(screen.getByText(/Get in touch with TenantPro/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/100 Panorama Way/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Bhopal, MP/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/Send Inquiry/i)).toBeInTheDocument();
   });
 
